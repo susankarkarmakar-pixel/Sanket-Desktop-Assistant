@@ -61,6 +61,8 @@ To build a production Windows Installer (.exe):
 2. Run `npm run dist`.
 3. The installer `.exe` will appear inside the `dist/` folder.
 
+To get a Windows installer automatically, create a new Release on GitHub — the `.exe` will be attached automatically within a few minutes.
+
 ## Structure
 - main.js: Main Electron process, handles window creation, global hotkeys, and system tray.
 - preload.js: Secure IPC bindings between React and Electron.
