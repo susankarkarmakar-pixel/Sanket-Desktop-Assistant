@@ -1,0 +1,36 @@
+{
+  "name": "sanket-desktop-assistant",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "vite",
+    "build": "vite build",
+    "electron:dev": "concurrently -k \"cross-env BROWSER=none vite\" \"wait-on http://localhost:5173 && electron .\""
+  },
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/susankarkarmakar-pixel/Sanket-Desktop-Assistant.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/susankarkarmakar-pixel/Sanket-Desktop-Assistant/issues"
+  },
+  "homepage": "https://github.com/susankarkarmakar-pixel/Sanket-Desktop-Assistant#readme",
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.4",
+    "concurrently": "^10.0.4",
+    "cross-env": "^10.1.0",
+    "electron": "^43.2.0",
+    "vite": "^8.1.5",
+    "wait-on": "^9.1.0"
+  }
+}
