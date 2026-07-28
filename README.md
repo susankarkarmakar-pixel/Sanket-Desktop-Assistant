@@ -51,6 +51,11 @@ A lightweight desktop assistant built with Electron and React.
 - View past copies, pin important ones, or click to copy them back to your active clipboard.
 - History limit set to 50 unpinned items to save memory.
 
+### 9. Quick Notes / Scratchpad
+- A large, distraction-free text area for jotting down quick thoughts, temporary numbers, or meeting notes.
+- Auto-saves silently in the background 1 second after you stop typing.
+- Immediately accessible via the system tray.
+
 ## Installation
 
 1. Make sure you have Node.js installed.
@@ -79,3 +84,4 @@ To get a Windows installer automatically, create a new Release on GitHub — the
 - src/contacts/ and src/contacts_backend/: Frontend and backend logic for the Contacts management feature.
 - src/vault/ and src/vault_backend/: Frontend and backend logic for the Vault feature.
 - src/clipboard/ and src/clipboard_backend/: Frontend and backend logic for the Clipboard History feature.
+- src/notes/ and src/notes_backend/: Frontend and backend logic for the Scratchpad feature.
