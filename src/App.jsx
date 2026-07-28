@@ -10,6 +10,7 @@ import ClipboardApp from './clipboard/ClipboardApp';
 import NotesApp from './notes/NotesApp';
 import TodoApp from './todo/TodoApp';
 import CalendarApp from './calendar/CalendarApp';
+import PomodoroApp from './pomodoro/PomodoroApp';
 
 function App() {
   const [view, setView] = useState('reminders');
@@ -40,6 +41,7 @@ function App() {
       {view === 'notes' && <NotesApp />}
       {view === 'todo' && <TodoApp />}
       {view === 'calendar' && <CalendarApp />}
+      {view === 'pomodoro' && <PomodoroApp />}
     </div>
   );
 }

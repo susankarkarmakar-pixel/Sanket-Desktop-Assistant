@@ -64,6 +64,7 @@ function createTray() {
     { label: 'Scratchpad', click: () => showApp('notes') },
     { label: 'To-Do List', click: () => showApp('todo') },
     { label: 'Calendar', click: () => showApp('calendar') },
+    { label: 'Pomodoro', click: () => showApp('pomodoro') },
     { type: 'separator' },
     { label: 'Quit', click: () => {
         isQuitting = true;
@@ -99,6 +100,7 @@ const { setupClipboardBackend } = require('./src/clipboard_backend/clipboard');
 const { setupNotesBackend } = require('./src/notes_backend/notes');
 const setupTodoBackend = require('./src/todo_backend/todoSetup');
 const setupCalendarBackend = require('./src/calendar_backend/calendarSetup');
+const setupPomodoroBackend = require('./src/pomodoro_backend/pomodoroSetup');
 
 app.whenReady().then(() => {
   createWindow();
@@ -114,6 +116,7 @@ app.whenReady().then(() => {
   setupNotesBackend();
   setupTodoBackend(app);
   setupCalendarBackend(app);
+  setupPomodoroBackend(app);
 
   globalShortcut.register('CommandOrControl+Shift+S', () => {
     showApp('launcher');
