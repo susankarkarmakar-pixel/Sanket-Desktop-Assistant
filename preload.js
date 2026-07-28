@@ -46,5 +46,11 @@ contextBridge.exposeInMainWorld('api', {
   vaultSaveEntry: (entry) => ipcRenderer.invoke('vault-save-entry', entry),
   vaultDeleteEntry: (id) => ipcRenderer.invoke('vault-delete-entry', id),
   vaultCopyPassword: (password) => ipcRenderer.invoke('vault-copy-password', password),
-  vaultImportChromeCsv: (filePath) => ipcRenderer.invoke('vault-import-chrome-csv', filePath)
+  vaultImportChromeCsv: (filePath) => ipcRenderer.invoke('vault-import-chrome-csv', filePath),
+
+  // Clipboard API
+  getClipboardHistory: () => ipcRenderer.invoke('get-clipboard-history'),
+  copyClipboardItem: (text) => ipcRenderer.invoke('copy-clipboard-item', text),
+  deleteClipboardItem: (id) => ipcRenderer.invoke('delete-clipboard-item', id),
+  togglePinClipboard: (id) => ipcRenderer.invoke('toggle-pin-clipboard', id)
 });
