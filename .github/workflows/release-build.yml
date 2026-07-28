@@ -26,6 +26,8 @@ jobs:
 
       - name: Build and Package
         run: npm run dist
+        env:
+          DEBUG: electron-builder
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
