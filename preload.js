@@ -56,5 +56,16 @@ contextBridge.exposeInMainWorld('api', {
 
   // Notes API
   getScratchpad: () => ipcRenderer.invoke('get-scratchpad'),
-  saveScratchpad: (text) => ipcRenderer.invoke('save-scratchpad', text)
+  saveScratchpad: (text) => ipcRenderer.invoke('save-scratchpad', text),
+
+  // To-Do API
+  getTodos: () => ipcRenderer.invoke('get-todos'),
+  addTodo: (todo) => ipcRenderer.invoke('add-todo', todo),
+  toggleTodo: (id) => ipcRenderer.invoke('toggle-todo', id),
+  deleteTodo: (id) => ipcRenderer.invoke('delete-todo', id),
+
+  // Calendar API
+  getCalendarEvents: () => ipcRenderer.invoke('get-calendar-events'),
+  addCalendarEvent: (event) => ipcRenderer.invoke('add-calendar-event', event),
+  deleteCalendarEvent: (id) => ipcRenderer.invoke('delete-calendar-event', id)
 });

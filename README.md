@@ -56,6 +56,16 @@ A lightweight desktop assistant built with Electron and React.
 - Auto-saves silently in the background 1 second after you stop typing.
 - Immediately accessible via the system tray.
 
+### 10. To-Do List / Task Manager
+- Simple checklist for daily tasks.
+- Track active and completed tasks.
+- Stored locally alongside other module data.
+
+### 11. Calendar Integration
+- Browse a full monthly calendar grid.
+- Click a day to view and add simple events.
+- Clear visual indicators of days that have events.
+
 ## Installation
 
 1. Make sure you have Node.js installed.
@@ -85,3 +95,5 @@ To get a Windows installer automatically, create a new Release on GitHub — the
 - src/vault/ and src/vault_backend/: Frontend and backend logic for the Vault feature.
 - src/clipboard/ and src/clipboard_backend/: Frontend and backend logic for the Clipboard History feature.
 - src/notes/ and src/notes_backend/: Frontend and backend logic for the Scratchpad feature.
+- src/todo/ and src/todo_backend/: Frontend and backend logic for the To-Do List feature.
+- src/calendar/ and src/calendar_backend/: Frontend and backend logic for the Calendar Integration feature.
