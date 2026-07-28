@@ -59,6 +59,7 @@ function createTray() {
     { label: 'Macros', click: () => showApp('macros') },
     { label: 'Activity', click: () => showApp('activity') },
     { label: 'Contacts', click: () => showApp('contacts') },
+    { label: 'Vault', click: () => showApp('vault') },
     { type: 'separator' },
     { label: 'Quit', click: () => {
         isQuitting = true;
@@ -89,6 +90,7 @@ const { setupFileFinderBackend } = require('./src/file_finder_backend/fileFinder
 const { setupAutomationBackend } = require('./src/automation_backend/automation');
 const { setupActivityBackend } = require('./src/activity_backend/activity');
 const { setupContactsBackend } = require('./src/contacts_backend/contacts');
+const { setupVaultBackend } = require('./src/vault_backend/vault');
 
 app.whenReady().then(() => {
   createWindow();
@@ -99,6 +101,7 @@ app.whenReady().then(() => {
   setupAutomationBackend();
   setupActivityBackend();
   setupContactsBackend();
+  setupVaultBackend();
 
   globalShortcut.register('CommandOrControl+Shift+S', () => {
     showApp('launcher');

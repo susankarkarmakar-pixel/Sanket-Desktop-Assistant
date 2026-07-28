@@ -39,6 +39,13 @@ A lightweight desktop assistant built with Electron and React.
 - Import contacts automatically from Google Contacts CSV exports.
 - Import contacts from Excel (`.xlsx`) files with a custom column mapping UI.
 
+### 7. Vault
+- Securely store passwords, usernames, and notes behind a master password.
+- Uses OS-level encryption (`safeStorage`) to encrypt data in the local JSON file.
+- Auto-locks the vault after 5 minutes of inactivity.
+- Temporarily copy passwords to the clipboard (auto-clears after 20 seconds).
+- Easily import passwords from Chrome CSV exports.
+
 ## Installation
 
 1. Make sure you have Node.js installed.
@@ -60,3 +67,4 @@ To build for production, run `npm run build` and then run the electron executabl
 - src/automation/ and src/automation_backend/: Frontend and backend logic for the Automation Macros feature.
 - src/activity/ and src/activity_backend/: Frontend and backend logic for the Activity History feature.
 - src/contacts/ and src/contacts_backend/: Frontend and backend logic for the Contacts management feature.
+- src/vault/ and src/vault_backend/: Frontend and backend logic for the Vault feature.

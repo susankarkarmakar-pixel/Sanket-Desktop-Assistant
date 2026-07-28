@@ -23,8 +23,8 @@ function doOpenWhatsApp(phone = '') {
 }
 
 function setupLauncherBackend() {
-  ipcMain.handle('open-browser', () => {
-    return doOpenBrowser();
+  ipcMain.handle('open-browser', (event, url) => {
+    return doOpenBrowser(url);
   });
 
   ipcMain.handle('open-whatsapp', (event, phone) => {

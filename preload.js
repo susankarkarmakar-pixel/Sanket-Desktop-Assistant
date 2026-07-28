@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld('api', {
   deleteReminder: (id) => ipcRenderer.invoke('delete-reminder', id),
 
   // Launcher API
-  openBrowser: () => ipcRenderer.invoke('open-browser'),
+  openBrowser: (url) => ipcRenderer.invoke('open-browser', url),
   openWhatsApp: () => ipcRenderer.invoke('open-whatsapp'),
 
   // File Finder API
@@ -36,5 +36,15 @@ contextBridge.exposeInMainWorld('api', {
   deleteContact: (id) => ipcRenderer.invoke('delete-contact', id),
   importContacts: (contacts) => ipcRenderer.invoke('import-contacts', contacts),
   parseCsv: (filePath) => ipcRenderer.invoke('parse-csv', filePath),
-  parseExcel: (filePath) => ipcRenderer.invoke('parse-excel', filePath)
+  parseExcel: (filePath) => ipcRenderer.invoke('parse-excel', filePath),
+
+  // Vault API
+  vaultHasMaster: () => ipcRenderer.invoke('vault-has-master'),
+  vaultSetMaster: (password) => ipcRenderer.invoke('vault-set-master', password),
+  vaultVerifyMaster: (password) => ipcRenderer.invoke('vault-verify-master', password),
+  vaultGetEntries: () => ipcRenderer.invoke('vault-get-entries'),
+  vaultSaveEntry: (entry) => ipcRenderer.invoke('vault-save-entry', entry),
+  vaultDeleteEntry: (id) => ipcRenderer.invoke('vault-delete-entry', id),
+  vaultCopyPassword: (password) => ipcRenderer.invoke('vault-copy-password', password),
+  vaultImportChromeCsv: (filePath) => ipcRenderer.invoke('vault-import-chrome-csv', filePath)
 });
