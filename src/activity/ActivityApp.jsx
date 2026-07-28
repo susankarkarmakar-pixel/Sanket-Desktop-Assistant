@@ -52,7 +52,7 @@ export default function ActivityApp() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Activity History</h2>
         <button onClick={clearOld} style={{ padding: '5px 10px', fontSize: '14px' }}>
-          Clear > 30 Days
+          Clear &gt; 30 Days
         </button>
       </div>
 

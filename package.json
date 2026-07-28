@@ -6,9 +6,35 @@
     "start": "electron .",
     "dev": "vite",
     "build": "vite build",
-    "electron:dev": "concurrently -k \"cross-env BROWSER=none vite\" \"wait-on http://localhost:5173 && electron .\""
+    "electron:dev": "concurrently -k \"cross-env BROWSER=none vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "dist": "npm run build && electron-builder --win"
   },
-  "description": "",
+  "build": {
+    "appId": "com.sanket.desktopassistant",
+    "productName": "Sanket Desktop Assistant",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "src/**/*",
+      "main.js",
+      "preload.js",
+      "icon.png",
+      "icon.ico"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
+    }
+  },
+  "description": "A lightweight desktop assistant running in the system tray",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/susankarkarmakar-pixel/Sanket-Desktop-Assistant.git"
@@ -23,14 +49,18 @@
   "homepage": "https://github.com/susankarkarmakar-pixel/Sanket-Desktop-Assistant#readme",
   "dependencies": {
     "chokidar": "^3.6.0",
+    "papaparse": "^5.5.4",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.4",
     "concurrently": "^10.0.4",
     "cross-env": "^10.1.0",
     "electron": "^43.2.0",
+    "electron-builder": "^26.15.3",
+    "sharp": "^0.35.3",
     "vite": "^8.1.5",
     "wait-on": "^9.1.0"
   }

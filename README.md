@@ -33,6 +33,19 @@ A lightweight desktop assistant built with Electron and React.
 - Groups logs cleanly by "Today", "Yesterday", and "Older".
 - Ability to clear history older than 30 days to free up space.
 
+### 6. Contacts
+- Searchable address book storing names, phone numbers, and email addresses.
+- One-click quick actions to open a WhatsApp chat or send an Email.
+- Import contacts automatically from Google Contacts CSV exports.
+- Import contacts from Excel (`.xlsx`) files with a custom column mapping UI.
+
+### 7. Vault
+- Securely store passwords, usernames, and notes behind a master password.
+- Uses OS-level encryption (`safeStorage`) to encrypt data in the local JSON file.
+- Auto-locks the vault after 5 minutes of inactivity.
+- Temporarily copy passwords to the clipboard (auto-clears after 20 seconds).
+- Easily import passwords from Chrome CSV exports.
+
 ## Installation
 
 1. Make sure you have Node.js installed.
@@ -43,7 +56,10 @@ A lightweight desktop assistant built with Electron and React.
 
 To run the application in development mode, run `npm run electron:dev`.
 
-To build for production, run `npm run build` and then run the electron executable directly.
+To build a production Windows Installer (.exe):
+1. Make sure you have run `npm install`.
+2. Run `npm run dist`.
+3. The installer `.exe` will appear inside the `dist/` folder.
 
 ## Structure
 - main.js: Main Electron process, handles window creation, global hotkeys, and system tray.
@@ -53,3 +69,5 @@ To build for production, run `npm run build` and then run the electron executabl
 - src/file_finder/ and src/file_finder_backend/: Frontend and backend logic for the File Finder feature.
 - src/automation/ and src/automation_backend/: Frontend and backend logic for the Automation Macros feature.
 - src/activity/ and src/activity_backend/: Frontend and backend logic for the Activity History feature.
+- src/contacts/ and src/contacts_backend/: Frontend and backend logic for the Contacts management feature.
+- src/vault/ and src/vault_backend/: Frontend and backend logic for the Vault feature.
