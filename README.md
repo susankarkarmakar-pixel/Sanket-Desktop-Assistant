@@ -56,7 +56,10 @@ A lightweight desktop assistant built with Electron and React.
 
 To run the application in development mode, run `npm run electron:dev`.
 
-To build for production, run `npm run build` and then run the electron executable directly.
+To build a production Windows Installer (.exe):
+1. Make sure you have run `npm install`.
+2. Run `npm run dist`.
+3. The installer `.exe` will appear inside the `dist/` folder.
 
 ## Structure
 - main.js: Main Electron process, handles window creation, global hotkeys, and system tray.
