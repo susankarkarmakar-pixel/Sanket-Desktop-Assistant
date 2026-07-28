@@ -28,5 +28,13 @@ contextBridge.exposeInMainWorld('api', {
 
   // Activity API
   getActivity: () => ipcRenderer.invoke('get-activity'),
-  clearOldActivity: () => ipcRenderer.invoke('clear-old-activity')
+  clearOldActivity: () => ipcRenderer.invoke('clear-old-activity'),
+
+  // Contacts API
+  getContacts: () => ipcRenderer.invoke('get-contacts'),
+  saveContact: (contact) => ipcRenderer.invoke('save-contact', contact),
+  deleteContact: (id) => ipcRenderer.invoke('delete-contact', id),
+  importContacts: (contacts) => ipcRenderer.invoke('import-contacts', contacts),
+  parseCsv: (filePath) => ipcRenderer.invoke('parse-csv', filePath),
+  parseExcel: (filePath) => ipcRenderer.invoke('parse-excel', filePath)
 });

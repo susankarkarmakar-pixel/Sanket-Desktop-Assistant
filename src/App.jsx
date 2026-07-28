@@ -4,6 +4,7 @@ import LauncherApp from './launcher/LauncherApp';
 import FileFinderApp from './file_finder/FileFinderApp';
 import MacrosApp from './automation/MacrosApp';
 import ActivityApp from './activity/ActivityApp';
+import ContactsApp from './contacts/ContactsApp';
 
 function App() {
   const [view, setView] = useState('reminders');
@@ -28,6 +29,7 @@ function App() {
       {view === 'fileFinder' && <FileFinderApp />}
       {view === 'macros' && <MacrosApp />}
       {view === 'activity' && <ActivityApp />}
+      {view === 'contacts' && <ContactsApp />}
     </div>
   );
 }

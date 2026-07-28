@@ -33,6 +33,12 @@ A lightweight desktop assistant built with Electron and React.
 - Groups logs cleanly by "Today", "Yesterday", and "Older".
 - Ability to clear history older than 30 days to free up space.
 
+### 6. Contacts
+- Searchable address book storing names, phone numbers, and email addresses.
+- One-click quick actions to open a WhatsApp chat or send an Email.
+- Import contacts automatically from Google Contacts CSV exports.
+- Import contacts from Excel (`.xlsx`) files with a custom column mapping UI.
+
 ## Installation
 
 1. Make sure you have Node.js installed.
@@ -53,3 +59,4 @@ To build for production, run `npm run build` and then run the electron executabl
 - src/file_finder/ and src/file_finder_backend/: Frontend and backend logic for the File Finder feature.
 - src/automation/ and src/automation_backend/: Frontend and backend logic for the Automation Macros feature.
 - src/activity/ and src/activity_backend/: Frontend and backend logic for the Activity History feature.
+- src/contacts/ and src/contacts_backend/: Frontend and backend logic for the Contacts management feature.
