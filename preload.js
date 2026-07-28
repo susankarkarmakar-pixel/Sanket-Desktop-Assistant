@@ -24,5 +24,9 @@ contextBridge.exposeInMainWorld('api', {
   saveMacro: (macro) => ipcRenderer.invoke('save-macro', macro),
   deleteMacro: (id) => ipcRenderer.invoke('delete-macro', id),
   runMacro: (id) => ipcRenderer.invoke('run-macro', id),
-  pickFile: (properties) => ipcRenderer.invoke('pick-file', properties)
+  pickFile: (properties) => ipcRenderer.invoke('pick-file', properties),
+
+  // Activity API
+  getActivity: () => ipcRenderer.invoke('get-activity'),
+  clearOldActivity: () => ipcRenderer.invoke('clear-old-activity')
 });

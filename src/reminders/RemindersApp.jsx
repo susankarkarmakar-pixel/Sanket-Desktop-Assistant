@@ -43,14 +43,20 @@ export default function RemindersApp() {
 
       {!form ? (
         <>
-          <button onClick={() => setForm({ title: '', date: '', time: '', category: 'Meeting', repeat: 'none' })}>
+          <button onClick={() => setForm({ title: '', date: '', time: '', category: 'Meeting', repeat: 'none', isPinned: false })}>
             Add Reminder
           </button>
 
           <ul style={{ listStyle: 'none', padding: 0 }}>
-            {reminders.map(r => (
-              <li key={r.id} style={{ borderBottom: '1px solid #ccc', padding: '10px 0', opacity: r.isDone ? 0.5 : 1 }}>
-                <div><strong>{r.title}</strong> - {r.category} {r.isDone ? '(Done)' : ''}</div>
+            {[...reminders].sort((a, b) => {
+              if (a.isDone !== b.isDone) return a.isDone ? 1 : -1;
+              if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+              const timeA = new Date(`${a.date}T${a.time}`).getTime();
+              const timeB = new Date(`${b.date}T${b.time}`).getTime();
+              return timeA - timeB;
+            }).map(r => (
+              <li key={r.id} style={{ borderBottom: '1px solid #ccc', padding: '10px 0', opacity: r.isDone ? 0.5 : 1, backgroundColor: r.isPinned && !r.isDone ? '#fff9c4' : 'transparent' }}>
+                <div><strong>{r.title}</strong> - {r.category} {r.isPinned ? '📌' : ''} {r.isDone ? '(Done)' : ''}</div>
                 <div style={{ fontSize: '0.9em', color: '#666' }}>
                   {r.date} {r.time} {r.repeat !== 'none' ? `(Repeats ${r.repeat})` : ''}
                 </div>
@@ -99,6 +105,14 @@ export default function RemindersApp() {
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
           </select>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <input
+              type="checkbox"
+              checked={!!form.isPinned}
+              onChange={e => setForm({...form, isPinned: e.target.checked})}
+            />
+            Pin Reminder (re-notify every 30 mins)
+          </label>
           <div style={{ display: 'flex', gap: '10px' }}>
             <button type="submit">Save</button>
             <button type="button" onClick={() => setForm(null)}>Cancel</button>
