@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "electron:dev": "concurrently -k \"cross-env BROWSER=none vite\" \"wait-on http://localhost:5173 && electron .\"",
-    "dist": "npm run build && electron-builder --win"
+    "dist": "npm run build && electron-builder --win -p never"
   },
   "build": {
     "appId": "com.sanket.desktopassistant",
