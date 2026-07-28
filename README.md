@@ -6,6 +6,7 @@ A lightweight desktop assistant built with Electron and React.
 
 ### 1. Reminders
 - Add reminders with title, date, time, category (Meeting / Pending Work / Field Visit), and optional repeat settings.
+- **Pinned Reminders:** Pin important reminders to keep them visible at the top of the list and receive automatic re-notifications every 30 minutes until marked done.
 - Stored locally without needing a backend server or database.
 - Checks every minute and shows a native desktop notification when due.
 - Notifications include Snooze and Mark as Done options.
@@ -15,6 +16,22 @@ A lightweight desktop assistant built with Electron and React.
 - Open the default web browser.
 - Open WhatsApp (desktop app if installed, fallback to web.whatsapp.com).
 - Modular architecture allowing simple expansion to more shortcuts later.
+
+### 3. File Finder
+- Find files locally in user-configured search directories (defaults to Desktop, Documents, Downloads).
+- Fast and debounced typing.
+- Open matched files using the OS default application.
+
+### 4. Automation Macros
+- Automate multi-step actions.
+- Supported steps: Open Browser, Open WhatsApp, Open File, Open Folder, Open Program.
+- Assign global hotkeys to run macros instantly in the background.
+
+### 5. Activity History
+- Background file watcher monitoring Desktop, Documents, and Downloads.
+- Automatically logs file creations and modifications.
+- Groups logs cleanly by "Today", "Yesterday", and "Older".
+- Ability to clear history older than 30 days to free up space.
 
 ## Installation
 
@@ -33,3 +50,6 @@ To build for production, run `npm run build` and then run the electron executabl
 - preload.js: Secure IPC bindings between React and Electron.
 - src/reminders/ and src/reminders_backend/: Frontend and backend logic for the Reminders feature.
 - src/launcher/ and src/launcher_backend/: Frontend and backend logic for the Quick Launcher feature.
+- src/file_finder/ and src/file_finder_backend/: Frontend and backend logic for the File Finder feature.
+- src/automation/ and src/automation_backend/: Frontend and backend logic for the Automation Macros feature.
+- src/activity/ and src/activity_backend/: Frontend and backend logic for the Activity History feature.

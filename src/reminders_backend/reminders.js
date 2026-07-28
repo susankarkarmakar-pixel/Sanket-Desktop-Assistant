@@ -18,7 +18,13 @@ function getReminders() {
   }
   const data = fs.readFileSync(p, 'utf-8');
   try {
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    if (Array.isArray(parsed)) {
+      return parsed; // legacy format
+    } else if (parsed && parsed.reminders) {
+      return parsed.reminders;
+    }
+    return [];
   } catch (e) {
     return [];
   }
@@ -26,7 +32,20 @@ function getReminders() {
 
 function saveReminders(reminders) {
   const p = getDataPath();
-  fs.writeFileSync(p, JSON.stringify(reminders, null, 2));
+  let fullData = {};
+  if (fs.existsSync(p)) {
+    try {
+      fullData = JSON.parse(fs.readFileSync(p, 'utf-8'));
+    } catch(e) {}
+  }
+
+  if (Array.isArray(fullData)) {
+    fullData = { reminders: reminders, fileFinderFolders: [] };
+  } else {
+    fullData.reminders = reminders;
+  }
+
+  fs.writeFileSync(p, JSON.stringify(fullData, null, 2));
 }
 
 function setupRemindersBackend() {
@@ -67,11 +86,31 @@ function checkReminders() {
     if (!reminder.isDone && reminder.date && reminder.time) {
       const reminderTime = new Date(`${reminder.date}T${reminder.time}`);
 
-      // If reminder time has passed and we haven't notified yet (we add a notified flag)
-      if (now >= reminderTime && !reminder.notified) {
-        showNotification(reminder);
-        reminder.notified = true;
-        changed = true;
+      // Check if overdue
+      if (now >= reminderTime) {
+        if (!reminder.notified) {
+          // First time notification
+          showNotification(reminder);
+          reminder.notified = true;
+          reminder.lastNotified = now.toISOString();
+          changed = true;
+        } else if (reminder.isPinned) {
+          // It's pinned, check if 30 minutes have passed since lastNotified
+          if (reminder.lastNotified) {
+            const lastNotifiedTime = new Date(reminder.lastNotified);
+            const diffMinutes = (now - lastNotifiedTime) / (1000 * 60);
+            if (diffMinutes >= 30) {
+              showNotification(reminder);
+              reminder.lastNotified = now.toISOString();
+              changed = true;
+            }
+          } else {
+            // Missing lastNotified on older pinned reminder, set it and notify
+            showNotification(reminder);
+            reminder.lastNotified = now.toISOString();
+            changed = true;
+          }
+        }
       }
     }
   });

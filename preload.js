@@ -10,5 +10,23 @@ contextBridge.exposeInMainWorld('api', {
 
   // Launcher API
   openBrowser: () => ipcRenderer.invoke('open-browser'),
-  openWhatsApp: () => ipcRenderer.invoke('open-whatsapp')
+  openWhatsApp: () => ipcRenderer.invoke('open-whatsapp'),
+
+  // File Finder API
+  searchFiles: (query) => ipcRenderer.invoke('search-files', query),
+  openFile: (filePath) => ipcRenderer.invoke('open-file', filePath),
+  getFileFinderFolders: () => ipcRenderer.invoke('get-file-finder-folders'),
+  addFileFinderFolder: (folder) => ipcRenderer.invoke('add-file-finder-folder', folder),
+  removeFileFinderFolder: (folder) => ipcRenderer.invoke('remove-file-finder-folder', folder),
+
+  // Automation API
+  getMacros: () => ipcRenderer.invoke('get-macros'),
+  saveMacro: (macro) => ipcRenderer.invoke('save-macro', macro),
+  deleteMacro: (id) => ipcRenderer.invoke('delete-macro', id),
+  runMacro: (id) => ipcRenderer.invoke('run-macro', id),
+  pickFile: (properties) => ipcRenderer.invoke('pick-file', properties),
+
+  // Activity API
+  getActivity: () => ipcRenderer.invoke('get-activity'),
+  clearOldActivity: () => ipcRenderer.invoke('clear-old-activity')
 });
