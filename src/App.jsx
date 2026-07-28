@@ -8,6 +8,8 @@ import ContactsApp from './contacts/ContactsApp';
 import VaultApp from './vault/VaultApp';
 import ClipboardApp from './clipboard/ClipboardApp';
 import NotesApp from './notes/NotesApp';
+import TodoApp from './todo/TodoApp';
+import CalendarApp from './calendar/CalendarApp';
 
 function App() {
   const [view, setView] = useState('reminders');
@@ -36,6 +38,8 @@ function App() {
       {view === 'vault' && <VaultApp />}
       {view === 'clipboard' && <ClipboardApp />}
       {view === 'notes' && <NotesApp />}
+      {view === 'todo' && <TodoApp />}
+      {view === 'calendar' && <CalendarApp />}
     </div>
   );
 }
