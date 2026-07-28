@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import RemindersApp from './reminders/RemindersApp';
 import LauncherApp from './launcher/LauncherApp';
 import FileFinderApp from './file_finder/FileFinderApp';
+import MacrosApp from './automation/MacrosApp';
 
 function App() {
   const [view, setView] = useState('reminders');
@@ -24,6 +25,7 @@ function App() {
       {view === 'reminders' && <RemindersApp />}
       {view === 'launcher' && <LauncherApp />}
       {view === 'fileFinder' && <FileFinderApp />}
+      {view === 'macros' && <MacrosApp />}
     </div>
   );
 }

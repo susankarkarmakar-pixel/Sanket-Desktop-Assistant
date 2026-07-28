@@ -56,6 +56,7 @@ function createTray() {
     { label: 'Reminders', click: () => showApp('reminders') },
     { label: 'Quick Launcher', click: () => showApp('launcher') },
     { label: 'File Finder', click: () => showApp('fileFinder') },
+    { label: 'Macros', click: () => showApp('macros') },
     { type: 'separator' },
     { label: 'Quit', click: () => {
         isQuitting = true;
@@ -83,6 +84,7 @@ function showApp(view) {
 const { setupRemindersBackend } = require('./src/reminders_backend/reminders');
 const { setupLauncherBackend } = require('./src/launcher_backend/launcher');
 const { setupFileFinderBackend } = require('./src/file_finder_backend/fileFinder');
+const { setupAutomationBackend } = require('./src/automation_backend/automation');
 
 app.whenReady().then(() => {
   createWindow();
@@ -90,6 +92,7 @@ app.whenReady().then(() => {
   setupRemindersBackend();
   setupLauncherBackend();
   setupFileFinderBackend();
+  setupAutomationBackend();
 
   globalShortcut.register('CommandOrControl+Shift+S', () => {
     showApp('launcher');

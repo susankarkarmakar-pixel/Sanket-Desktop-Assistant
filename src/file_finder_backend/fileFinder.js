@@ -20,7 +20,7 @@ function getDataPath() {
 function migrateDataIfNeeded() {
   const p = getDataPath();
   if (!fs.existsSync(p)) {
-    fs.writeFileSync(p, JSON.stringify({ reminders: [], fileFinderFolders: [] }, null, 2));
+    fs.writeFileSync(p, JSON.stringify({ reminders: [], fileFinderFolders: [], macros: [] }, null, 2));
     return;
   }
   let data = fs.readFileSync(p, 'utf-8');
@@ -30,16 +30,18 @@ function migrateDataIfNeeded() {
       // Migrate
       parsed = {
         reminders: parsed,
-        fileFinderFolders: []
+        fileFinderFolders: [],
+        macros: []
       };
       fs.writeFileSync(p, JSON.stringify(parsed, null, 2));
-    } else if (!parsed.fileFinderFolders) {
-      parsed.fileFinderFolders = [];
+    } else if (!parsed.fileFinderFolders || !parsed.macros) {
+      if (!parsed.fileFinderFolders) parsed.fileFinderFolders = [];
+      if (!parsed.macros) parsed.macros = [];
       fs.writeFileSync(p, JSON.stringify(parsed, null, 2));
     }
   } catch (e) {
     // corrupted file
-    fs.writeFileSync(p, JSON.stringify({ reminders: [], fileFinderFolders: [] }, null, 2));
+    fs.writeFileSync(p, JSON.stringify({ reminders: [], fileFinderFolders: [], macros: [] }, null, 2));
   }
 }
 
