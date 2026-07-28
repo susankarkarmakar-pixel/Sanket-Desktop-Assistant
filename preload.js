@@ -52,5 +52,9 @@ contextBridge.exposeInMainWorld('api', {
   getClipboardHistory: () => ipcRenderer.invoke('get-clipboard-history'),
   copyClipboardItem: (text) => ipcRenderer.invoke('copy-clipboard-item', text),
   deleteClipboardItem: (id) => ipcRenderer.invoke('delete-clipboard-item', id),
-  togglePinClipboard: (id) => ipcRenderer.invoke('toggle-pin-clipboard', id)
+  togglePinClipboard: (id) => ipcRenderer.invoke('toggle-pin-clipboard', id),
+
+  // Notes API
+  getScratchpad: () => ipcRenderer.invoke('get-scratchpad'),
+  saveScratchpad: (text) => ipcRenderer.invoke('save-scratchpad', text)
 });

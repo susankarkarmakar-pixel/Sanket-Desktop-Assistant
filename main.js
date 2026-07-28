@@ -61,6 +61,7 @@ function createTray() {
     { label: 'Contacts', click: () => showApp('contacts') },
     { label: 'Vault', click: () => showApp('vault') },
     { label: 'Clipboard', click: () => showApp('clipboard') },
+    { label: 'Scratchpad', click: () => showApp('notes') },
     { type: 'separator' },
     { label: 'Quit', click: () => {
         isQuitting = true;
@@ -93,6 +94,7 @@ const { setupActivityBackend } = require('./src/activity_backend/activity');
 const { setupContactsBackend } = require('./src/contacts_backend/contacts');
 const { setupVaultBackend } = require('./src/vault_backend/vault');
 const { setupClipboardBackend } = require('./src/clipboard_backend/clipboard');
+const { setupNotesBackend } = require('./src/notes_backend/notes');
 
 app.whenReady().then(() => {
   createWindow();
@@ -105,6 +107,7 @@ app.whenReady().then(() => {
   setupContactsBackend();
   setupVaultBackend();
   setupClipboardBackend();
+  setupNotesBackend();
 
   globalShortcut.register('CommandOrControl+Shift+S', () => {
     showApp('launcher');

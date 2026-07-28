@@ -7,6 +7,7 @@ import ActivityApp from './activity/ActivityApp';
 import ContactsApp from './contacts/ContactsApp';
 import VaultApp from './vault/VaultApp';
 import ClipboardApp from './clipboard/ClipboardApp';
+import NotesApp from './notes/NotesApp';
 
 function App() {
   const [view, setView] = useState('reminders');
@@ -34,6 +35,7 @@ function App() {
       {view === 'contacts' && <ContactsApp />}
       {view === 'vault' && <VaultApp />}
       {view === 'clipboard' && <ClipboardApp />}
+      {view === 'notes' && <NotesApp />}
     </div>
   );
 }
