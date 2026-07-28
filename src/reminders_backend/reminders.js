@@ -18,7 +18,13 @@ function getReminders() {
   }
   const data = fs.readFileSync(p, 'utf-8');
   try {
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    if (Array.isArray(parsed)) {
+      return parsed; // legacy format
+    } else if (parsed && parsed.reminders) {
+      return parsed.reminders;
+    }
+    return [];
   } catch (e) {
     return [];
   }
@@ -26,7 +32,20 @@ function getReminders() {
 
 function saveReminders(reminders) {
   const p = getDataPath();
-  fs.writeFileSync(p, JSON.stringify(reminders, null, 2));
+  let fullData = {};
+  if (fs.existsSync(p)) {
+    try {
+      fullData = JSON.parse(fs.readFileSync(p, 'utf-8'));
+    } catch(e) {}
+  }
+
+  if (Array.isArray(fullData)) {
+    fullData = { reminders: reminders, fileFinderFolders: [] };
+  } else {
+    fullData.reminders = reminders;
+  }
+
+  fs.writeFileSync(p, JSON.stringify(fullData, null, 2));
 }
 
 function setupRemindersBackend() {
