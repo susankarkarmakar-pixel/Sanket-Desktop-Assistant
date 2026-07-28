@@ -6,6 +6,7 @@ import MacrosApp from './automation/MacrosApp';
 import ActivityApp from './activity/ActivityApp';
 import ContactsApp from './contacts/ContactsApp';
 import VaultApp from './vault/VaultApp';
+import ClipboardApp from './clipboard/ClipboardApp';
 
 function App() {
   const [view, setView] = useState('reminders');
@@ -32,6 +33,7 @@ function App() {
       {view === 'activity' && <ActivityApp />}
       {view === 'contacts' && <ContactsApp />}
       {view === 'vault' && <VaultApp />}
+      {view === 'clipboard' && <ClipboardApp />}
     </div>
   );
 }
