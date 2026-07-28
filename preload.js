@@ -67,5 +67,8 @@ contextBridge.exposeInMainWorld('api', {
   // Calendar API
   getCalendarEvents: () => ipcRenderer.invoke('get-calendar-events'),
   addCalendarEvent: (event) => ipcRenderer.invoke('add-calendar-event', event),
-  deleteCalendarEvent: (id) => ipcRenderer.invoke('delete-calendar-event', id)
+  deleteCalendarEvent: (id) => ipcRenderer.invoke('delete-calendar-event', id),
+
+  // Pomodoro API
+  notifyPomodoro: (options) => ipcRenderer.invoke('notify-pomodoro', options)
 });

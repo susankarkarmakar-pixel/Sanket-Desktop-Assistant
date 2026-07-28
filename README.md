@@ -66,6 +66,11 @@ A lightweight desktop assistant built with Electron and React.
 - Click a day to view and add simple events.
 - Clear visual indicators of days that have events.
 
+### 12. Pomodoro Timer
+- A productivity focus timer.
+- Select between Focus (25m), Short Break (5m), and Long Break (15m) modes.
+- Visual countdown and native OS notifications when the timer completes.
+
 ## Installation
 
 1. Make sure you have Node.js installed.
@@ -97,3 +102,4 @@ To get a Windows installer automatically, create a new Release on GitHub — the
 - src/notes/ and src/notes_backend/: Frontend and backend logic for the Scratchpad feature.
 - src/todo/ and src/todo_backend/: Frontend and backend logic for the To-Do List feature.
 - src/calendar/ and src/calendar_backend/: Frontend and backend logic for the Calendar Integration feature.
+- src/pomodoro/ and src/pomodoro_backend/: Frontend and backend logic for the Pomodoro Timer feature.
