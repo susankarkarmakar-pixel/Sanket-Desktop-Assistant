@@ -82,5 +82,15 @@ contextBridge.exposeInMainWorld('api', {
   getOrganizerRules: () => ipcRenderer.invoke('get-organizer-rules'),
   saveOrganizerRule: (rule) => ipcRenderer.invoke('save-organizer-rule', rule),
   deleteOrganizerRule: (id) => ipcRenderer.invoke('delete-organizer-rule', id),
-  toggleOrganizerRule: (id) => ipcRenderer.invoke('toggle-organizer-rule', id)
+  toggleOrganizerRule: (id) => ipcRenderer.invoke('toggle-organizer-rule', id),
+
+  // Voice Announce API
+  getVoiceSettings: () => ipcRenderer.invoke('voice:getSettings'),
+  saveVoiceSettings: (settings) => ipcRenderer.invoke('voice:saveSettings', settings),
+  testVoiceAnnounce: (data) => ipcRenderer.invoke('voice:testAnnounce', data),
+  onVoiceAnnounce: (callback) => {
+    const handler = (event, data) => callback(data);
+    ipcRenderer.on('voice:announce', handler);
+    return () => ipcRenderer.removeListener('voice:announce', handler);
+  }
 });

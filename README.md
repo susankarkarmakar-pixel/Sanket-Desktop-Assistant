@@ -81,6 +81,11 @@ A lightweight desktop assistant built with Electron and React.
 - Runs silently in the background via intelligent folder watching.
 - Easily toggle rules on or off and configure source/target directories.
 
+### 15. Smart Voice Assistant
+- Automatically announces upcoming meetings, deadlines, and reminders using native text-to-speech.
+- Dual language support (English and Bengali) with automatic language detection.
+- Configurable settings for advance notice times, quiet hours, speech rate, and volume.
+
 ## Installation
 
 1. Make sure you have Node.js installed.
@@ -115,3 +120,4 @@ To get a Windows installer automatically, create a new Release on GitHub — the
 - src/pomodoro/ and src/pomodoro_backend/: Frontend and backend logic for the Pomodoro Timer feature.
 - src/snippets/ and src/snippets_backend/: Frontend and backend logic for the Snippets feature.
 - src/organizer/ and src/organizer_backend/: Frontend and backend logic for the Auto Document Organizer feature.
+- src/voice_announce/ and src/voice_announce_backend/: Frontend and backend logic for the Smart Voice Assistant.

@@ -19,7 +19,8 @@ import {
   CalendarDays,
   PenTool,
   Timer,
-  FolderSync
+  FolderSync,
+  Mic
 } from 'lucide-react';
 
 const navItems = [
@@ -37,6 +38,7 @@ const navItems = [
   { id: 'pomodoro', label: 'Pomodoro', icon: Timer },
   { id: 'snippets', label: 'Snippets', icon: Command },
   { id: 'organizer', label: 'Organizer', icon: FolderSync },
+  { id: 'voiceAnnounce', label: 'Voice', icon: Mic },
 ];
 
 export function Sidebar({ currentView, setView }) {
