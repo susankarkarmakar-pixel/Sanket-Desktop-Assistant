@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Lock, Unlock, Key, ShieldCheck, Search, Plus, Upload, Copy, ExternalLink, Edit2, Trash2, ShieldAlert, Eye, EyeOff, Globe } from 'lucide-react';
+import { Input, Button, Card, Badge, cn } from '../components/ui';
 
 export default function VaultApp() {
   const [hasMaster, setHasMaster] = useState(null);
@@ -6,15 +9,17 @@ export default function VaultApp() {
   const [passwordInput, setPasswordInput] = useState('');
 
   const [entries, setEntries] = useState([]);
+  const [search, setSearch] = useState('');
   const [form, setForm] = useState(null);
+  const [revealedPasswords, setRevealedPasswords] = useState(new Set());
 
   const timerRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     checkMaster();
   }, []);
 
-  // Lock automatically after 5 minutes of inactivity when unlocked
   useEffect(() => {
     if (unlocked) {
       resetLockTimer();
@@ -28,19 +33,25 @@ export default function VaultApp() {
     }
   }, [unlocked]);
 
+  useEffect(() => {
+    if ((hasMaster === false || (!unlocked && hasMaster)) && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [hasMaster, unlocked]);
+
   const resetLockTimer = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       setUnlocked(false);
-      setEntries([]); // Clear state for safety
+      setEntries([]);
       setPasswordInput('');
+      setRevealedPasswords(new Set());
     }, 5 * 60 * 1000);
   };
 
   const checkMaster = async () => {
     if (window.api && window.api.vaultHasMaster) {
-      const has = await window.api.vaultHasMaster();
-      setHasMaster(has);
+      setHasMaster(await window.api.vaultHasMaster());
     }
   };
 
@@ -64,7 +75,8 @@ export default function VaultApp() {
         setPasswordInput('');
         loadEntries();
       } else {
-        alert('Incorrect master password');
+        // Flash red animation or something
+        setPasswordInput('');
       }
     }
   };
@@ -72,12 +84,12 @@ export default function VaultApp() {
   const lockVault = () => {
     setUnlocked(false);
     setEntries([]);
+    setRevealedPasswords(new Set());
   };
 
   const loadEntries = async () => {
     if (window.api && window.api.vaultGetEntries) {
-      const data = await window.api.vaultGetEntries();
-      setEntries(data);
+      setEntries(await window.api.vaultGetEntries());
     }
   };
 
@@ -100,7 +112,12 @@ export default function VaultApp() {
   const copyPassword = async (pwd) => {
     if (window.api && window.api.vaultCopyPassword) {
       await window.api.vaultCopyPassword(pwd);
-      alert('Password copied to clipboard! (will clear in 20s)');
+    }
+  };
+
+  const copyUsername = async (user) => {
+    if (window.api && window.api.copySnippet) {
+      await window.api.copySnippet(user);
     }
   };
 
@@ -117,130 +134,252 @@ export default function VaultApp() {
       const path = await window.api.pickFile(['openFile']);
       if (path && window.api.vaultImportChromeCsv) {
         try {
-          const count = await window.api.vaultImportChromeCsv(path);
-          alert(`Successfully imported ${count} passwords from Chrome CSV.`);
+          await window.api.vaultImportChromeCsv(path);
           loadEntries();
         } catch (err) {
-          alert('Failed to import CSV: ' + err.message);
+          console.error('Failed to import CSV:', err);
         }
       }
     }
   };
 
-  if (hasMaster === null) return <div>Loading...</div>;
+  const toggleReveal = (id) => {
+    setRevealedPasswords(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+  };
 
-  if (!hasMaster) {
-    return (
-      <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'center', marginTop: '50px' }}>
-        <h2>Setup Vault</h2>
-        <p>Set a master password to secure your credentials. Do not forget this password, as it cannot be recovered!</p>
-        <form onSubmit={setupMaster} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <input
-            type="password"
-            placeholder="Master Password"
-            value={passwordInput}
-            onChange={e => setPasswordInput(e.target.value)}
-            required
-            style={{ padding: '10px' }}
-          />
-          <button type="submit" style={{ padding: '10px' }}>Set Password</button>
-        </form>
-      </div>
-    );
-  }
+  const filtered = entries.filter(e =>
+    (e.portalName && e.portalName.toLowerCase().includes(search.toLowerCase())) ||
+    (e.username && e.username.toLowerCase().includes(search.toLowerCase())) ||
+    (e.url && e.url.toLowerCase().includes(search.toLowerCase()))
+  );
 
-  if (!unlocked) {
+  if (hasMaster === null) return null;
+
+  if (!hasMaster || !unlocked) {
     return (
-      <div style={{ maxWidth: '400px', margin: '0 auto', textAlign: 'center', marginTop: '50px' }}>
-        <h2>Vault Locked</h2>
-        <form onSubmit={unlockVault} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <input
-            type="password"
-            placeholder="Master Password"
-            value={passwordInput}
-            onChange={e => setPasswordInput(e.target.value)}
-            required
-            style={{ padding: '10px' }}
-          />
-          <button type="submit" style={{ padding: '10px' }}>Unlock</button>
-        </form>
+      <div className="h-full flex items-center justify-center p-6">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-md">
+          <Card className="p-8 text-center bg-surface relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-purple-500 to-primary" />
+
+            <div className="w-20 h-20 bg-bg rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-border">
+              {hasMaster ? <Lock className="w-8 h-8 text-primary" /> : <ShieldAlert className="w-8 h-8 text-warning" />}
+            </div>
+
+            <h2 className="text-2xl font-bold mb-2">{hasMaster ? 'Vault Locked' : 'Setup Master Password'}</h2>
+            <p className="text-text/60 text-sm mb-8">
+              {hasMaster
+                ? 'Enter your master password to unlock your credentials.'
+                : 'Create a strong master password to encrypt your vault. This cannot be recovered if lost.'
+              }
+            </p>
+
+            <form onSubmit={hasMaster ? unlockVault : setupMaster} className="space-y-4">
+              <Input
+                ref={inputRef}
+                type="password"
+                placeholder="Master Password"
+                value={passwordInput}
+                onChange={e => setPasswordInput(e.target.value)}
+                required
+                className="text-center text-lg tracking-widest py-3 h-12"
+              />
+              <Button type="submit" className="w-full h-12 text-lg font-semibold">
+                {hasMaster ? (
+                  <><Unlock className="w-5 h-5 mr-2" /> Unlock Vault</>
+                ) : (
+                  <><ShieldCheck className="w-5 h-5 mr-2" /> Encrypt Vault</>
+                )}
+              </Button>
+            </form>
+          </Card>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Vault</h2>
-        <button onClick={lockVault} style={{ backgroundColor: '#ffcccc' }}>Lock Vault</button>
+    <div className="h-full relative pb-20">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div className="relative flex-1 w-full max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text/50" />
+          <Input
+            placeholder="Search vault..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-9 bg-surface"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="secondary" onClick={importChrome}>
+            <Upload className="w-4 h-4 mr-2" /> Chrome CSV
+          </Button>
+          <Button onClick={() => setForm({ portalName: '', url: '', username: '', password: '', notes: '' })}>
+            <Plus className="w-4 h-4 mr-2" /> Add Entry
+          </Button>
+          <Button variant="danger" onClick={lockVault}>
+            <Lock className="w-4 h-4 mr-2" /> Lock Vault
+          </Button>
+        </div>
       </div>
 
-      {!form ? (
-        <>
-          <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-            <button onClick={() => setForm({ portalName: '', url: '', username: '', password: '', notes: '' })}>Add Entry</button>
-            <button onClick={importChrome}>Import Chrome Passwords</button>
-          </div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <AnimatePresence>
+          {filtered.map(e => (
+            <motion.div
+              key={e.id}
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+            >
+              <Card className="flex flex-col h-full group relative overflow-hidden transition-shadow hover:shadow-md hover:border-primary/30">
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '15px' }}>
-            {entries.map(e => (
-              <div key={e.id} style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '5px', backgroundColor: '#fff' }}>
-                <h3 style={{ margin: '0 0 10px 0' }}>{e.portalName}</h3>
-                {e.username && <div><strong>User:</strong> {e.username}</div>}
-                {e.notes && <div style={{ color: '#666', fontSize: '0.9em', marginTop: '5px' }}>{e.notes}</div>}
-
-                <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginTop: '15px' }}>
-                  <button onClick={() => copyPassword(e.password)}>Copy Password</button>
-                  {e.url && <button onClick={() => openPortal(e.url)}>Open Portal</button>}
-                  <button onClick={() => setForm(e)}>Edit</button>
-                  <button onClick={() => handleDelete(e.id)}>Delete</button>
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 z-10">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 bg-surface/80 backdrop-blur-sm" onClick={() => setForm(e)}>
+                    <Edit2 className="w-4 h-4 text-text/70 hover:text-primary" />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 bg-surface/80 backdrop-blur-sm" onClick={() => handleDelete(e.id)}>
+                    <Trash2 className="w-4 h-4 text-text/70 hover:text-danger" />
+                  </Button>
                 </div>
+
+                <div className="p-5 flex-1">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-bg border border-border flex items-center justify-center shrink-0 shadow-sm">
+                      <Key className="w-5 h-5 text-text/60" />
+                    </div>
+                    <div className="overflow-hidden">
+                      <h3 className="font-semibold text-base truncate">{e.portalName}</h3>
+                      {e.url && (
+                        <p className="text-xs text-text/50 truncate flex items-center hover:text-primary cursor-pointer transition-colors" onClick={() => openPortal(e.url)}>
+                          {e.url.replace(/^https?:\/\//, '')}
+                          <ExternalLink className="w-3 h-3 ml-1" />
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 mt-4">
+                    {e.username && (
+                      <div>
+                        <p className="text-[10px] font-semibold text-text/40 uppercase tracking-wider mb-1">Username / Email</p>
+                        <div className="flex items-center group/item">
+                          <code className="text-sm bg-bg px-2 py-1 rounded border border-border flex-1 truncate">{e.username}</code>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover/item:opacity-100 ml-1" onClick={() => copyUsername(e.username)}>
+                            <Copy className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <p className="text-[10px] font-semibold text-text/40 uppercase tracking-wider mb-1">Password</p>
+                      <div className="flex items-center group/item">
+                        <code className="text-sm bg-bg px-2 py-1 rounded border border-border flex-1 truncate font-mono tracking-widest text-text/80">
+                          {revealedPasswords.has(e.id) ? e.password : '••••••••••••'}
+                        </code>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 ml-1" onClick={() => toggleReveal(e.id)}>
+                          {revealedPasswords.has(e.id) ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 bg-surface border-t border-border mt-auto">
+                  <Button className="w-full h-9 text-sm" onClick={() => copyPassword(e.password)}>
+                    <Copy className="w-4 h-4 mr-2" /> Copy Password
+                  </Button>
+                </div>
+              </Card>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {filtered.length === 0 && (
+          <div className="col-span-full text-center py-20 text-text/50">
+            <ShieldCheck className="w-16 h-16 mx-auto mb-4 opacity-20" />
+            <h3 className="text-xl font-medium mb-2 text-text/80">Vault is empty</h3>
+            <p className="max-w-md mx-auto">Store your passwords securely. They are encrypted before being saved to your local machine.</p>
+          </div>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {form && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
+              onClick={() => setForm(null)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-bg border border-border rounded-xl shadow-xl z-50 overflow-hidden"
+            >
+              <div className="p-6 border-b border-border flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Key className="w-5 h-5 text-primary" />
+                </div>
+                <h2 className="text-xl font-semibold">{form.id ? 'Edit Entry' : 'New Entry'}</h2>
               </div>
-            ))}
-          </div>
-          {entries.length === 0 && <p>No vault entries found.</p>}
-        </>
-      ) : (
-        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '400px' }}>
-          <h3>{form.id ? 'Edit' : 'Add'} Entry</h3>
-          <input
-            type="text"
-            placeholder="Portal Name (e.g. GitHub)"
-            value={form.portalName}
-            onChange={e => setForm({...form, portalName: e.target.value})}
-            required
-          />
-          <input
-            type="text"
-            placeholder="URL (optional)"
-            value={form.url}
-            onChange={e => setForm({...form, url: e.target.value})}
-          />
-          <input
-            type="text"
-            placeholder="Username (optional)"
-            value={form.username}
-            onChange={e => setForm({...form, username: e.target.value})}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={e => setForm({...form, password: e.target.value})}
-            required
-          />
-          <textarea
-            placeholder="Notes (optional)"
-            value={form.notes}
-            onChange={e => setForm({...form, notes: e.target.value})}
-            rows={3}
-          />
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button type="submit">Save</button>
-            <button type="button" onClick={() => setForm(null)}>Cancel</button>
-          </div>
-        </form>
-      )}
+              <form onSubmit={handleSave} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-text/70 mb-1">Title / Portal Name</label>
+                  <Input
+                    placeholder="e.g. GitHub, Bank"
+                    value={form.portalName}
+                    onChange={e => setForm({...form, portalName: e.target.value})}
+                    required
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-text/70 mb-1">URL / Website</label>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text/40" />
+                    <Input
+                      className="pl-9"
+                      placeholder="e.g. github.com"
+                      value={form.url}
+                      onChange={e => setForm({...form, url: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-text/70 mb-1">Username / Email</label>
+                  <Input
+                    placeholder="john@example.com"
+                    value={form.username}
+                    onChange={e => setForm({...form, username: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-text/70 mb-1">Password</label>
+                  <Input
+                    type="password"
+                    placeholder="••••••••••••"
+                    value={form.password}
+                    onChange={e => setForm({...form, password: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4 mt-2 border-t border-border">
+                  <Button type="button" variant="ghost" onClick={() => setForm(null)}>Cancel</Button>
+                  <Button type="submit">Save Securely</Button>
+                </div>
+              </form>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -49,18 +49,26 @@
   "homepage": "https://github.com/susankarkarmakar-pixel/Sanket-Desktop-Assistant#readme",
   "dependencies": {
     "chokidar": "^3.6.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.43.0",
+    "lucide-react": "^1.27.0",
     "papaparse": "^5.5.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "tailwind-merge": "^3.6.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^6.0.4",
+    "autoprefixer": "^10.5.4",
     "concurrently": "^10.0.4",
     "cross-env": "^10.1.0",
     "electron": "^43.2.0",
     "electron-builder": "^26.15.3",
+    "postcss": "^8.5.24",
     "sharp": "^0.35.3",
+    "tailwindcss": "^4.3.3",
     "vite": "^8.1.5",
     "wait-on": "^9.1.0"
   }
