@@ -57,6 +57,9 @@ contextBridge.exposeInMainWorld('api', {
   // Notes API
   getScratchpad: () => ipcRenderer.invoke('get-scratchpad'),
   saveScratchpad: (text) => ipcRenderer.invoke('save-scratchpad', text),
+  getNotesAll: () => ipcRenderer.invoke('notes:get'),
+  saveNote: (note) => ipcRenderer.invoke('notes:save', note),
+  deleteNote: (id) => ipcRenderer.invoke('notes:delete', id),
 
   // To-Do API
   getTodos: () => ipcRenderer.invoke('get-todos'),
@@ -83,6 +86,23 @@ contextBridge.exposeInMainWorld('api', {
   saveOrganizerRule: (rule) => ipcRenderer.invoke('save-organizer-rule', rule),
   deleteOrganizerRule: (id) => ipcRenderer.invoke('delete-organizer-rule', id),
   toggleOrganizerRule: (id) => ipcRenderer.invoke('toggle-organizer-rule', id),
+
+  // Widget API
+  spawnWidget: (type) => ipcRenderer.invoke('spawn-widget', type),
+
+  // Habits API
+  getHabits: () => ipcRenderer.invoke('habits:get'),
+  addHabit: (title) => ipcRenderer.invoke('habits:add', title),
+  deleteHabit: (id) => ipcRenderer.invoke('habits:delete', id),
+  toggleHabit: (data) => ipcRenderer.invoke('habits:toggle', data),
+
+  // Analytics API
+  getAnalyticsStats: () => ipcRenderer.invoke('analytics:getStats'),
+  logPomodoro: (data) => ipcRenderer.invoke('analytics:logPomodoro', data),
+
+  // Settings / Backup API
+  exportData: () => ipcRenderer.invoke('settings:exportData'),
+  importData: () => ipcRenderer.invoke('settings:importData'),
 
   // Voice Announce API
   getVoiceSettings: () => ipcRenderer.invoke('voice:getSettings'),

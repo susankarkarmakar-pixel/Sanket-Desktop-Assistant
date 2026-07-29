@@ -14,6 +14,9 @@ import PomodoroApp from './pomodoro/PomodoroApp';
 import SnippetsApp from './snippets/SnippetsApp';
 import OrganizerApp from './organizer/OrganizerApp';
 import VoiceAnnounceApp from './voice_announce/VoiceAnnounceApp';
+import HabitApp from './habits/HabitApp';
+import AnalyticsApp from './analytics/AnalyticsApp';
+import SettingsApp from './settings/SettingsApp';
 import AnnouncementPlayer from './voice_announce/AnnouncementPlayer';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { Sidebar } from './components/Sidebar';
@@ -30,10 +33,33 @@ function AppContent() {
         if (active) setView(newView);
       });
     }
+
+    // Check if this is a widget window via URL params
+    const params = new URLSearchParams(window.location.search);
+    const widgetType = params.get('widget');
+    if (widgetType) {
+      setView(widgetType);
+    }
+
     return () => {
       active = false;
     };
   }, []);
+
+  // Widget Mode Render
+  const params = new URLSearchParams(window.location.search);
+  const isWidget = params.has('widget');
+
+  if (isWidget) {
+    return (
+      <div className="flex h-screen w-full bg-bg/80 backdrop-blur-md overflow-hidden text-text p-4 rounded-xl border border-border/50" style={{ WebkitAppRegion: 'drag' }}>
+        <div style={{ WebkitAppRegion: 'no-drag' }} className="w-full h-full">
+            {view === 'pomodoro' && <PomodoroApp />}
+            {view === 'todo' && <TodoApp />}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen w-full bg-bg overflow-hidden text-text selection:bg-primary/30">
@@ -64,6 +90,9 @@ function AppContent() {
             {view === 'snippets' && <SnippetsApp />}
             {view === 'organizer' && <OrganizerApp />}
             {view === 'voiceAnnounce' && <VoiceAnnounceApp />}
+            {view === 'habits' && <HabitApp />}
+            {view === 'analytics' && <AnalyticsApp />}
+            {view === 'settings' && <SettingsApp />}
           </div>
         </main>
       </div>

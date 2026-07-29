@@ -101,12 +101,52 @@ const { setupContactsBackend } = require('./src/contacts_backend/contacts');
 const { setupVaultBackend } = require('./src/vault_backend/vault');
 const { setupClipboardBackend } = require('./src/clipboard_backend/clipboard');
 const { setupNotesBackend } = require('./src/notes_backend/notes');
+const setupEnhancedNotes = require('./src/notes_backend/notesSetup');
 const setupTodoBackend = require('./src/todo_backend/todoSetup');
 const setupCalendarBackend = require('./src/calendar_backend/calendarSetup');
 const setupPomodoroBackend = require('./src/pomodoro_backend/pomodoroSetup');
 const setupSnippetsBackend = require('./src/snippets_backend/snippetsSetup');
 const setupOrganizerBackend = require('./src/organizer_backend/organizerSetup');
 const setupVoiceBackend = require('./src/voice_announce_backend/voiceSetup');
+const setupHabitsBackend = require('./src/habits_backend/habitSetup');
+const setupAnalyticsBackend = require('./src/analytics_backend/analyticsSetup');
+const setupSettingsBackend = require('./src/settings_backend/settingsSetup');
+
+let widgetWindow = null;
+
+function createWidgetWindow(widgetType) {
+  if (widgetWindow) {
+    widgetWindow.close();
+  }
+
+  widgetWindow = new BrowserWindow({
+    width: 300,
+    height: 400,
+    show: false,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  const url = isDev
+    ? (process.env.BROWSER === 'none' ? 'http://localhost:5173' : 'http://localhost:5173') + `?widget=${widgetType}`
+    : `file://${path.join(__dirname, 'build', 'index.html')}?widget=${widgetType}`;
+
+  widgetWindow.loadURL(url);
+
+  widgetWindow.once('ready-to-show', () => {
+    widgetWindow.show();
+  });
+
+  widgetWindow.on('closed', () => {
+    widgetWindow = null;
+  });
+}
 
 app.whenReady().then(() => {
   createWindow();
@@ -120,12 +160,21 @@ app.whenReady().then(() => {
   setupVaultBackend();
   setupClipboardBackend();
   setupNotesBackend();
+  setupEnhancedNotes(app);
   setupTodoBackend(app);
   setupCalendarBackend(app);
   setupPomodoroBackend(app);
   setupSnippetsBackend(app);
   setupOrganizerBackend(app);
   setupVoiceBackend(app, () => mainWindow);
+  setupHabitsBackend(app);
+  setupAnalyticsBackend(app);
+  setupSettingsBackend(app, () => mainWindow);
+
+  ipcMain.handle('spawn-widget', (event, type) => {
+    createWidgetWindow(type);
+    return true;
+  });
 
   globalShortcut.register('CommandOrControl+Shift+S', () => {
     showApp('launcher');
