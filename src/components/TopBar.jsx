@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Plus, Bell, Command, FileText, CheckCircle, BellRing, Link, Users, TerminalSquare } from 'lucide-react';
+import { Search, Plus, Bell, Command, FileText, CheckCircle, BellRing, Link, Users, TerminalSquare, FolderSync } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function TopBar({ currentViewLabel, setView }) {
@@ -77,6 +77,12 @@ export function TopBar({ currentViewLabel, setView }) {
              const macros = await window.api.getMacros();
              const matching = macros.filter(m => m.name.toLowerCase().includes(lowerQuery));
              combinedResults = [...combinedResults, ...matching.map(m => ({ ...m, _type: 'macro', title: m.name, _icon: TerminalSquare, _view: 'macros' }))];
+          }
+          // Organizer Rules
+          if (window.api.getOrganizerRules) {
+             const rules = await window.api.getOrganizerRules();
+             const matching = rules.filter(r => (r.sourceFolder || '').toLowerCase().includes(lowerQuery) || (r.targetFolder || '').toLowerCase().includes(lowerQuery));
+             combinedResults = [...combinedResults, ...matching.map(r => ({ ...r, _type: 'organizer rule', title: `${r.conditionType === 'extension' ? 'Ext' : 'Name'}: ${r.conditionValue}`, _icon: FolderSync, _view: 'organizer' }))];
           }
         }
       } catch (err) {

@@ -76,5 +76,11 @@ contextBridge.exposeInMainWorld('api', {
   getSnippets: () => ipcRenderer.invoke('get-snippets'),
   addSnippet: (snippet) => ipcRenderer.invoke('add-snippet', snippet),
   deleteSnippet: (id) => ipcRenderer.invoke('delete-snippet', id),
-  copySnippet: (text) => ipcRenderer.invoke('copy-snippet', text)
+  copySnippet: (text) => ipcRenderer.invoke('copy-snippet', text),
+
+  // Organizer API
+  getOrganizerRules: () => ipcRenderer.invoke('get-organizer-rules'),
+  saveOrganizerRule: (rule) => ipcRenderer.invoke('save-organizer-rule', rule),
+  deleteOrganizerRule: (id) => ipcRenderer.invoke('delete-organizer-rule', id),
+  toggleOrganizerRule: (id) => ipcRenderer.invoke('toggle-organizer-rule', id)
 });
