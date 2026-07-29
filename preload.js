@@ -104,6 +104,12 @@ contextBridge.exposeInMainWorld('api', {
   exportData: () => ipcRenderer.invoke('settings:exportData'),
   importData: () => ipcRenderer.invoke('settings:importData'),
 
+  // Window Controls
+  minimizeWindow: () => ipcRenderer.invoke('window:minimize'),
+  maximizeWindow: () => ipcRenderer.invoke('window:maximize'),
+  closeWindow: () => ipcRenderer.invoke('window:close'),
+  getPlatform: () => process.platform,
+
   // Voice Announce API
   getVoiceSettings: () => ipcRenderer.invoke('voice:getSettings'),
   saveVoiceSettings: (settings) => ipcRenderer.invoke('voice:saveSettings', settings),
