@@ -71,6 +71,11 @@ A lightweight desktop assistant built with Electron and React.
 - Select between Focus (25m), Short Break (5m), and Long Break (15m) modes.
 - Visual countdown and native OS notifications when the timer completes.
 
+### 13. Text Expander / Snippets
+- Quickly save and copy frequently used text templates (e.g., email signatures, common replies).
+- Fast search functionality to find specific snippets.
+- One-click copy directly to the system clipboard.
+
 ## Installation
 
 1. Make sure you have Node.js installed.
@@ -103,3 +108,4 @@ To get a Windows installer automatically, create a new Release on GitHub — the
 - src/todo/ and src/todo_backend/: Frontend and backend logic for the To-Do List feature.
 - src/calendar/ and src/calendar_backend/: Frontend and backend logic for the Calendar Integration feature.
 - src/pomodoro/ and src/pomodoro_backend/: Frontend and backend logic for the Pomodoro Timer feature.
+- src/snippets/ and src/snippets_backend/: Frontend and backend logic for the Snippets feature.
