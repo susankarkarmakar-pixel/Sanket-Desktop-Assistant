@@ -132,18 +132,18 @@ export function TopBar({ currentViewLabel, setView, isVoicePlaying }) {
   };
 
   return (
-    <header className="h-14 bg-bg border-b border-border flex items-center px-6 shrink-0 z-30 sticky top-0">
+    <header className="h-[52px] bg-surface/80 backdrop-blur-xl border-b border-border/50 flex items-center px-6 shrink-0 z-30 sticky top-0 drag-region mt-2 mr-2 rounded-t-2xl">
 
       {/* Breadcrumb / Title */}
-      <div className="w-1/3 flex items-center">
+      <div className="w-1/3 flex items-center no-drag-region">
         <h1 className="text-lg font-semibold text-text capitalize">
           {currentViewLabel || 'Dashboard'}
         </h1>
       </div>
 
       {/* Global Search */}
-      <div className="w-1/3 flex justify-center" ref={searchRef}>
-        <div className="relative w-full max-w-md">
+      <div className="w-1/3 flex justify-center no-drag-region" ref={searchRef}>
+        <div className="relative w-full max-w-md shadow-[0_1px_2px_rgba(0,0,0,0.04)] rounded-lg">
           <div
             className="relative group cursor-text"
             onClick={() => {
@@ -225,12 +225,12 @@ export function TopBar({ currentViewLabel, setView, isVoicePlaying }) {
       </div>
 
       {/* Right Actions */}
-      <div className="w-1/3 flex items-center justify-end space-x-2 sm:space-x-4">
+      <div className="w-1/3 flex items-center justify-end space-x-2 sm:space-x-4 no-drag-region">
 
         {/* Widget Spawner */}
         <button
           onClick={() => window.api && window.api.spawnWidget && window.api.spawnWidget(currentViewLabel.toLowerCase() === 'pomodoro' ? 'pomodoro' : 'todo')}
-          className="p-2 text-text/70 hover:text-primary hover:bg-primary/10 rounded-full transition-colors hidden sm:block"
+          className="p-2 text-text/70 hover:text-primary hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors hidden sm:block"
           title="Pop out as mini widget"
         >
           <svg xmlns="http://www.w3.org/0000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="9" x2="15" y1="3" y2="3"/><line x1="9" x2="15" y1="21" y2="21"/><path d="M15 3v18"/><path d="M9 3v18"/></svg>

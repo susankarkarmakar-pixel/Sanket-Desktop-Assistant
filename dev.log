@@ -1,0 +1,11 @@
+
+> sanket-desktop-assistant@1.0.0 dev
+> vite
+
+
+  VITE v8.1.5  ready in 363 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+12:32:01 PM [vite] (client) [optimizer] scanning dependencies...
+12:43:34 PM [vite] (client) hmr update /src/reminders/RemindersApp.jsx, /src/index.css

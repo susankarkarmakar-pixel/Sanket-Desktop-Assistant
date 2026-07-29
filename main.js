@@ -11,9 +11,17 @@ const isDev = process.env.NODE_ENV !== 'production' && !(app && app.isPackaged);
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 700,
+    minWidth: 800,
+    minHeight: 600,
     show: false,
+    frame: process.platform === 'darwin', // Native frame on macOS for traffic lights, frameless on Windows/Linux
+    titleBarStyle: 'hidden', // Hides titlebar but keeps traffic lights on macOS
+    trafficLightPosition: { x: 16, y: 16 },
+    vibrancy: 'under-window',
+    visualEffectState: 'active',
+    backgroundColor: '#00000000', // Transparent for glass effect
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -178,6 +186,20 @@ app.whenReady().then(() => {
 
   globalShortcut.register('CommandOrControl+Shift+S', () => {
     showApp('launcher');
+  });
+
+  // Window Control IPCs for frameless windows (Windows/Linux)
+  ipcMain.handle('window:minimize', () => {
+    if (mainWindow) mainWindow.minimize();
+  });
+  ipcMain.handle('window:maximize', () => {
+    if (mainWindow) {
+      if (mainWindow.isMaximized()) mainWindow.unmaximize();
+      else mainWindow.maximize();
+    }
+  });
+  ipcMain.handle('window:close', () => {
+    if (mainWindow) mainWindow.hide();
   });
 
   app.on('activate', () => {

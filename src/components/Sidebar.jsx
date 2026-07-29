@@ -50,43 +50,68 @@ export function Sidebar({ currentView, setView }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
+  // Custom window controls for Windows/Linux
+  const isMac = window.api && window.api.getPlatform ? window.api.getPlatform() === 'darwin' : false;
+
+  const handleMinimize = () => window.api?.minimizeWindow();
+  const handleMaximize = () => window.api?.maximizeWindow();
+  const handleClose = () => window.api?.closeWindow();
+
   return (
     <aside
       className={cn(
-        "h-screen bg-surface border-r border-border transition-all duration-300 flex flex-col z-20",
+        "h-screen bg-surface/80 backdrop-blur-2xl border-r border-border/50 transition-all duration-300 flex flex-col z-20 drag-region shadow-[1px_0_10px_rgba(0,0,0,0.02)] dark:shadow-none",
         isExpanded ? "w-60" : "w-16"
       )}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
-      {/* Logo Area */}
-      <div className="h-14 flex items-center px-4 border-b border-border shrink-0">
-        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+      {/* Logo Area & Traffic Lights */}
+      <div className="h-[52px] flex items-center px-4 shrink-0 relative mt-2">
+
+        {/* Windows/Linux Custom Traffic Lights */}
+        {!isMac && (
+          <div className="absolute top-2 left-4 flex gap-2 no-drag-region group/lights">
+            <button onClick={handleClose} className="w-3 h-3 rounded-full bg-[#FF3B30] border border-[#E0443E] flex items-center justify-center opacity-80 hover:opacity-100">
+               <span className="opacity-0 group-hover/lights:opacity-100 text-[8px] font-bold text-black/50 leading-none">x</span>
+            </button>
+            <button onClick={handleMinimize} className="w-3 h-3 rounded-full bg-[#FF9500] border border-[#DEA129] flex items-center justify-center opacity-80 hover:opacity-100">
+               <span className="opacity-0 group-hover/lights:opacity-100 text-[8px] font-bold text-black/50 leading-none">-</span>
+            </button>
+            <button onClick={handleMaximize} className="w-3 h-3 rounded-full bg-[#28C840] border border-[#24B538] flex items-center justify-center opacity-80 hover:opacity-100">
+               <span className="opacity-0 group-hover/lights:opacity-100 text-[8px] font-bold text-black/50 leading-none">+</span>
+            </button>
+          </div>
+        )}
+
+        <div className={cn("w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary-hover shadow-sm flex items-center justify-center shrink-0 no-drag-region", !isMac && "mt-6")}>
           <span className="text-white font-bold text-lg">S</span>
         </div>
         <div className={cn(
           "ml-3 font-semibold text-lg whitespace-nowrap overflow-hidden transition-all duration-300",
-          isExpanded ? "w-auto opacity-100" : "w-0 opacity-0"
+          isExpanded ? "w-auto opacity-100" : "w-0 opacity-0",
+          !isMac && "mt-6"
         )}>
           Sanket
         </div>
         <div className={cn(
           "ml-auto w-2 h-2 rounded-full bg-success shrink-0 transition-opacity duration-300",
-          isExpanded ? "opacity-100" : "opacity-0 hidden"
+          isExpanded ? "opacity-100" : "opacity-0 hidden",
+          !isMac && "mt-6"
         )} title="System Status: Online" />
       </div>
 
       {/* Nav Links */}
-      <div className="flex-1 overflow-y-auto py-4 px-2 space-y-1 overflow-x-hidden scrollbar-hide">
+      <div className="flex-1 overflow-y-auto py-4 px-2 space-y-1 overflow-x-hidden scrollbar-hide no-drag-region">
         {navItems.map((item) => (
           <button
             key={item.id}
             onClick={() => setView(item.id)}
             className={cn(
-              "w-full flex items-center h-10 px-2 rounded-md transition-colors relative group",
+              "w-full flex items-center h-10 px-2 rounded-lg transition-all relative group",
               currentView === item.id
-                ? "bg-primary/10 text-primary font-medium"
-                : "text-text hover:bg-black/5 dark:hover:bg-white/5"
+                ? "bg-primary text-white shadow-sm"
+                : "text-text/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-text"
             )}
             title={!isExpanded ? item.label : undefined}
           >
@@ -105,10 +130,10 @@ export function Sidebar({ currentView, setView }) {
       </div>
 
       {/* Bottom Area */}
-      <div className="p-2 border-t border-border shrink-0 space-y-1">
+      <div className="p-2 border-t border-border/50 shrink-0 space-y-1 no-drag-region pb-4">
         <button
           onClick={toggleTheme}
-          className="w-full flex items-center h-10 px-2 rounded-md text-text hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          className="w-full flex items-center h-10 px-2 rounded-lg text-text/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-text transition-colors"
           title={!isExpanded ? "Toggle Theme" : undefined}
         >
           {theme === 'dark' ? <Sun className="w-5 h-5 ml-1 shrink-0" /> : <Moon className="w-5 h-5 ml-1 shrink-0" />}
@@ -123,10 +148,10 @@ export function Sidebar({ currentView, setView }) {
         <button
           onClick={() => setView('settings')}
           className={cn(
-            "w-full flex items-center h-10 px-2 rounded-md transition-colors",
+            "w-full flex items-center h-10 px-2 rounded-lg transition-colors",
             currentView === 'settings'
-              ? "bg-primary/10 text-primary font-medium"
-              : "text-text hover:bg-black/5 dark:hover:bg-white/5"
+              ? "bg-primary text-white shadow-sm"
+              : "text-text/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-text"
           )}
           title={!isExpanded ? "Settings" : undefined}
         >

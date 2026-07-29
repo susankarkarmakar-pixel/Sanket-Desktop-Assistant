@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Card, Input, Badge, cn } from '../components/ui';
-import { Plus, Clock, MapPin, Briefcase, Calendar, MoreVertical, Edit2, Trash2, Pin, CheckCircle2 } from 'lucide-react';
+import { Plus, Clock, MapPin, Briefcase, Calendar, MoreVertical, Edit2, Trash2, Pin, CheckCircle2, Bell } from 'lucide-react';
 
 export default function RemindersApp() {
   const [reminders, setReminders] = useState([]);

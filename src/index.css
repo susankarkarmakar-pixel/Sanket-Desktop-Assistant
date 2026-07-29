@@ -1,39 +1,40 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #4F46E5;
-  --color-primary-hover: #4338CA;
+  --color-primary: #007AFF; /* Apple Blue */
+  --color-primary-hover: #0056b3;
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-text: var(--text);
   --color-border: var(--border);
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-danger: #EF4444;
+  --color-success: #34C759; /* Apple Green */
+  --color-warning: #FF9500; /* Apple Orange */
+  --color-danger: #FF3B30; /* Apple Red */
 }
 
 @layer base {
   :root {
-    --bg: #ffffff;
-    --surface: #F8FAFC;
-    --text: #334155;
-    --border: #E2E8F0;
+    --bg: #F5F5F7; /* Apple system gray 6 light */
+    --surface: rgba(255, 255, 255, 0.7); /* Translucent white for glassmorphism */
+    --text: #1C1C1E; /* Apple dark text */
+    --border: rgba(60, 60, 67, 0.1);
   }
 
   :root.dark {
-    --bg: #0F172A;
-    --surface: #1E293B;
-    --text: #F1F5F9;
-    --border: #334155;
+    --bg: #000000; /* True black background */
+    --surface: rgba(28, 28, 30, 0.7); /* Translucent dark gray */
+    --text: #F2F2F7; /* Apple light text */
+    --border: rgba(84, 84, 88, 0.3);
   }
 
   body {
-    background-color: var(--bg);
+    background-color: transparent; /* Rely on container to show transparency if enabled by OS */
     color: var(--text);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
     margin: 0;
     padding: 0;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   * {
@@ -42,10 +43,10 @@
   }
 }
 
-/* Custom Scrollbar for a more native feel */
+/* Custom Scrollbar styled like macOS overlay */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
@@ -53,14 +54,29 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+:root.dark ::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 :root.dark ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Base utility for draggable regions */
+.drag-region {
+  -webkit-app-region: drag;
+}
+
+.no-drag-region {
+  -webkit-app-region: no-drag;
 }
