@@ -12,6 +12,7 @@ import TodoApp from './todo/TodoApp';
 import CalendarApp from './calendar/CalendarApp';
 import PomodoroApp from './pomodoro/PomodoroApp';
 import SnippetsApp from './snippets/SnippetsApp';
+import OrganizerApp from './organizer/OrganizerApp';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
@@ -56,6 +57,7 @@ function AppContent() {
             {view === 'calendar' && <CalendarApp />}
             {view === 'pomodoro' && <PomodoroApp />}
             {view === 'snippets' && <SnippetsApp />}
+            {view === 'organizer' && <OrganizerApp />}
           </div>
         </main>
       </div>

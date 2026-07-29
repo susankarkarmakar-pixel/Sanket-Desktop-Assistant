@@ -76,6 +76,11 @@ A lightweight desktop assistant built with Electron and React.
 - Fast search functionality to find specific snippets.
 - One-click copy directly to the system clipboard.
 
+### 14. Auto Document Organizer
+- Define custom rules to automatically organize incoming files based on file extension or filename.
+- Runs silently in the background via intelligent folder watching.
+- Easily toggle rules on or off and configure source/target directories.
+
 ## Installation
 
 1. Make sure you have Node.js installed.
@@ -109,3 +114,4 @@ To get a Windows installer automatically, create a new Release on GitHub — the
 - src/calendar/ and src/calendar_backend/: Frontend and backend logic for the Calendar Integration feature.
 - src/pomodoro/ and src/pomodoro_backend/: Frontend and backend logic for the Pomodoro Timer feature.
 - src/snippets/ and src/snippets_backend/: Frontend and backend logic for the Snippets feature.
+- src/organizer/ and src/organizer_backend/: Frontend and backend logic for the Auto Document Organizer feature.
