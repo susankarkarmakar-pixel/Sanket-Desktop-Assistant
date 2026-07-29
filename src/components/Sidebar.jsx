@@ -20,7 +20,10 @@ import {
   PenTool,
   Timer,
   FolderSync,
-  Mic
+  Mic,
+  BarChart3,
+  Flame,
+  Settings2
 } from 'lucide-react';
 
 const navItems = [
@@ -39,6 +42,8 @@ const navItems = [
   { id: 'snippets', label: 'Snippets', icon: Command },
   { id: 'organizer', label: 'Organizer', icon: FolderSync },
   { id: 'voiceAnnounce', label: 'Voice', icon: Mic },
+  { id: 'habits', label: 'Habits', icon: Flame },
+  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
 ];
 
 export function Sidebar({ currentView, setView }) {
@@ -116,10 +121,16 @@ export function Sidebar({ currentView, setView }) {
         </button>
 
         <button
-          className="w-full flex items-center h-10 px-2 rounded-md text-text hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          onClick={() => setView('settings')}
+          className={cn(
+            "w-full flex items-center h-10 px-2 rounded-md transition-colors",
+            currentView === 'settings'
+              ? "bg-primary/10 text-primary font-medium"
+              : "text-text hover:bg-black/5 dark:hover:bg-white/5"
+          )}
           title={!isExpanded ? "Settings" : undefined}
         >
-          <Settings className="w-5 h-5 ml-1 shrink-0" />
+          <Settings2 className="w-5 h-5 ml-1 shrink-0" />
           <span className={cn(
             "ml-3 whitespace-nowrap overflow-hidden transition-all duration-300",
             isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 w-0"

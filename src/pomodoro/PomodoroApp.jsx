@@ -29,6 +29,12 @@ export default function PomodoroApp() {
         } else if (isActive && timeLeft === 0) {
             setIsActive(false);
             setProgress(0);
+
+            // Log session to analytics
+            if (window.api && window.api.logPomodoro) {
+                window.api.logPomodoro({ mode, durationSeconds: MODES[mode].time });
+            }
+
             if (window.api && window.api.notifyPomodoro) {
                 window.api.notifyPomodoro({
                     title: `${MODES[mode].label} Finished!`,

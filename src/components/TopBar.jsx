@@ -226,6 +226,16 @@ export function TopBar({ currentViewLabel, setView, isVoicePlaying }) {
 
       {/* Right Actions */}
       <div className="w-1/3 flex items-center justify-end space-x-2 sm:space-x-4">
+
+        {/* Widget Spawner */}
+        <button
+          onClick={() => window.api && window.api.spawnWidget && window.api.spawnWidget(currentViewLabel.toLowerCase() === 'pomodoro' ? 'pomodoro' : 'todo')}
+          className="p-2 text-text/70 hover:text-primary hover:bg-primary/10 rounded-full transition-colors hidden sm:block"
+          title="Pop out as mini widget"
+        >
+          <svg xmlns="http://www.w3.org/0000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="9" x2="15" y1="3" y2="3"/><line x1="9" x2="15" y1="21" y2="21"/><path d="M15 3v18"/><path d="M9 3v18"/></svg>
+        </button>
+
         <button
           onClick={toggleMute}
           className="p-2 text-text/70 hover:text-text hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors relative"
