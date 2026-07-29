@@ -44,7 +44,9 @@ function createWindow() {
   });
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.show();
+    }
   });
 }
 
@@ -148,7 +150,9 @@ function createWidgetWindow(widgetType) {
   widgetWindow.loadURL(url);
 
   widgetWindow.once('ready-to-show', () => {
-    widgetWindow.show();
+    if (widgetWindow && !widgetWindow.isDestroyed()) {
+      widgetWindow.show();
+    }
   });
 
   widgetWindow.on('closed', () => {
