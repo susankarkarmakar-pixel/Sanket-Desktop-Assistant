@@ -67,6 +67,7 @@ function createTray() {
     { label: 'Pomodoro', click: () => showApp('pomodoro') },
     { label: 'Snippets', click: () => showApp('snippets') },
     { label: 'Auto Organizer', click: () => showApp('organizer') },
+    { label: 'Voice Assistant', click: () => showApp('voiceAnnounce') },
     { type: 'separator' },
     { label: 'Quit', click: () => {
         isQuitting = true;
@@ -105,6 +106,7 @@ const setupCalendarBackend = require('./src/calendar_backend/calendarSetup');
 const setupPomodoroBackend = require('./src/pomodoro_backend/pomodoroSetup');
 const setupSnippetsBackend = require('./src/snippets_backend/snippetsSetup');
 const setupOrganizerBackend = require('./src/organizer_backend/organizerSetup');
+const setupVoiceBackend = require('./src/voice_announce_backend/voiceSetup');
 
 app.whenReady().then(() => {
   createWindow();
@@ -123,6 +125,7 @@ app.whenReady().then(() => {
   setupPomodoroBackend(app);
   setupSnippetsBackend(app);
   setupOrganizerBackend(app);
+  setupVoiceBackend(app, () => mainWindow);
 
   globalShortcut.register('CommandOrControl+Shift+S', () => {
     showApp('launcher');

@@ -13,12 +13,15 @@ import CalendarApp from './calendar/CalendarApp';
 import PomodoroApp from './pomodoro/PomodoroApp';
 import SnippetsApp from './snippets/SnippetsApp';
 import OrganizerApp from './organizer/OrganizerApp';
+import VoiceAnnounceApp from './voice_announce/VoiceAnnounceApp';
+import AnnouncementPlayer from './voice_announce/AnnouncementPlayer';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { Sidebar } from './components/Sidebar';
 import { TopBar } from './components/TopBar';
 
 function AppContent() {
   const [view, setView] = useState('reminders');
+  const [isVoicePlaying, setIsVoicePlaying] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -34,12 +37,14 @@ function AppContent() {
 
   return (
     <div className="flex h-screen w-full bg-bg overflow-hidden text-text selection:bg-primary/30">
+      <AnnouncementPlayer onPlayingChange={setIsVoicePlaying} />
       <Sidebar currentView={view} setView={setView} />
 
       <div className="flex-1 flex flex-col h-full min-w-0">
         <TopBar
           currentViewLabel={view.replace(/([A-Z])/g, ' $1').trim()}
           setView={setView}
+          isVoicePlaying={isVoicePlaying}
         />
 
         <main className="flex-1 overflow-y-auto p-6 scroll-smooth">
@@ -58,6 +63,7 @@ function AppContent() {
             {view === 'pomodoro' && <PomodoroApp />}
             {view === 'snippets' && <SnippetsApp />}
             {view === 'organizer' && <OrganizerApp />}
+            {view === 'voiceAnnounce' && <VoiceAnnounceApp />}
           </div>
         </main>
       </div>

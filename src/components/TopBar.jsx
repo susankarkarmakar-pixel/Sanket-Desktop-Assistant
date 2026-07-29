@@ -1,8 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Plus, Bell, Command, FileText, CheckCircle, BellRing, Link, Users, TerminalSquare, FolderSync } from 'lucide-react';
+import { Search, Plus, Bell, Command, FileText, CheckCircle, BellRing, Link, Users, TerminalSquare, FolderSync, Volume2, VolumeX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export function TopBar({ currentViewLabel, setView }) {
+export function TopBar({ currentViewLabel, setView, isVoicePlaying }) {
+  const [isMuted, setIsMuted] = useState(false);
+
+  useEffect(() => {
+    const checkMute = () => {
+      const muteUntil = localStorage.getItem('sanket-voice-mute-until');
+      if (muteUntil && parseInt(muteUntil, 10) > Date.now()) {
+        setIsMuted(true);
+      } else {
+        setIsMuted(false);
+      }
+    };
+    checkMute();
+    const interval = setInterval(checkMute, 10000); // Check every 10s
+    return () => clearInterval(interval);
+  }, []);
+
+  const toggleMute = () => {
+    if (isMuted) {
+      localStorage.removeItem('sanket-voice-mute-until');
+      setIsMuted(false);
+    } else {
+      // Mute for 1 hour
+      localStorage.setItem('sanket-voice-mute-until', (Date.now() + 60 * 60 * 1000).toString());
+      setIsMuted(true);
+      window.speechSynthesis.cancel(); // Stop currently playing immediately
+    }
+  };
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -198,7 +225,18 @@ export function TopBar({ currentViewLabel, setView }) {
       </div>
 
       {/* Right Actions */}
-      <div className="w-1/3 flex items-center justify-end space-x-4">
+      <div className="w-1/3 flex items-center justify-end space-x-2 sm:space-x-4">
+        <button
+          onClick={toggleMute}
+          className="p-2 text-text/70 hover:text-text hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors relative"
+          title={isMuted ? "Unmute Voice Announcements" : "Mute Voice Announcements (1 Hour)"}
+        >
+          {isMuted ? <VolumeX className="h-5 w-5 text-warning" /> : <Volume2 className="h-5 w-5" />}
+          {isVoicePlaying && !isMuted && (
+            <span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-success ring-2 ring-bg animate-pulse" />
+          )}
+        </button>
+
         <button className="p-2 text-text/70 hover:text-text hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors relative">
           <Bell className="h-5 w-5" />
           <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-danger ring-2 ring-bg" />
