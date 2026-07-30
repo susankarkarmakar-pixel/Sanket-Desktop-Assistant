@@ -3,37 +3,7 @@ const path = require('path');
 const { ipcMain } = require('electron');
 
 module.exports = function setupNotes(app) {
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'reminders.json');
-
-    function readDb() {
-        if (!fs.existsSync(dbPath)) return { notes: [] };
-        try {
-            const data = fs.readFileSync(dbPath, 'utf8');
-            const parsed = JSON.parse(data);
-
-            // Migration: Convert old single scratchpad string to new notes array format
-            if (parsed.scratchpad && typeof parsed.scratchpad === 'string') {
-                parsed.notes = [{
-                    id: Date.now().toString(),
-                    title: 'Quick Scratchpad',
-                    content: parsed.scratchpad,
-                    updatedAt: new Date().toISOString()
-                }];
-                delete parsed.scratchpad;
-                writeDb(parsed);
-            }
-
-            if (!parsed.notes) parsed.notes = [];
-            return parsed;
-        } catch (error) {
-            return { notes: [] };
-        }
-    }
-
-    function writeDb(data) {
-        fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
-    }
+    const { readDb, writeDb } = require('../utils/db');
 
     ipcMain.handle('notes:get', () => {
         const db = readDb();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, FolderOpen, FileText, Settings2, X, HardDrive, Plus, Image, FileCode2, FileBox } from 'lucide-react';
+import { Search, FolderOpen, FileText, Settings2, X, HardDrive, Plus, Image, FileCode2, FileBox, FileSearch } from 'lucide-react';
 import { Input, Button, Card, cn } from '../components/ui';
 
 export default function FileFinderApp() {

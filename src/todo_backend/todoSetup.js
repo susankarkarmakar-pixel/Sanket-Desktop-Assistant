@@ -3,24 +3,7 @@ const path = require('path');
 const { ipcMain } = require('electron');
 
 module.exports = function setupTodo(app) {
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'reminders.json');
-
-    function readDb() {
-        if (!fs.existsSync(dbPath)) return { todos: [] };
-        try {
-            const data = fs.readFileSync(dbPath, 'utf8');
-            const parsed = JSON.parse(data);
-            if (!parsed.todos) parsed.todos = [];
-            return parsed;
-        } catch (error) {
-            return { todos: [] };
-        }
-    }
-
-    function writeDb(data) {
-        fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
-    }
+    const { readDb, writeDb } = require('../../src/utils/db');
 
     ipcMain.handle('get-todos', () => {
         const db = readDb();

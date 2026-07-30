@@ -4,35 +4,14 @@ const fs = require('fs');
 const crypto = require('crypto');
 const Papa = require('papaparse');
 
-let dataPath;
-
-function getDataPath() {
-  if (!dataPath) {
-    dataPath = path.join(app.getPath('userData'), 'reminders.json');
-  }
-  return dataPath;
-}
+const { readDb, writeDb } = require('../utils/db');
 
 function getData() {
-  const p = getDataPath();
-  if (!fs.existsSync(p)) {
-    return { reminders: [], fileFinderFolders: [], macros: [], activityHistory: [], contacts: [], vault: [], vaultMasterHash: null };
-  }
-  try {
-    let parsed = JSON.parse(fs.readFileSync(p, 'utf-8'));
-    if (Array.isArray(parsed)) {
-      parsed = { reminders: parsed, fileFinderFolders: [], macros: [], activityHistory: [], contacts: [], vault: [], vaultMasterHash: null };
-    }
-    if (!parsed.vault) parsed.vault = [];
-    return parsed;
-  } catch (e) {
-    return { reminders: [], fileFinderFolders: [], macros: [], activityHistory: [], contacts: [], vault: [], vaultMasterHash: null };
-  }
+  return readDb();
 }
 
 function saveData(obj) {
-  const p = getDataPath();
-  fs.writeFileSync(p, JSON.stringify(obj, null, 2));
+  writeDb(obj);
 }
 
 function hashPassword(password) {
