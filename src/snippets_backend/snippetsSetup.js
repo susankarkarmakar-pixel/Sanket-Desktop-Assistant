@@ -3,24 +3,7 @@ const path = require('path');
 const { ipcMain, clipboard } = require('electron');
 
 module.exports = function setupSnippets(app) {
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'reminders.json');
-
-    function readDb() {
-        if (!fs.existsSync(dbPath)) return { snippets: [] };
-        try {
-            const data = fs.readFileSync(dbPath, 'utf8');
-            const parsed = JSON.parse(data);
-            if (!parsed.snippets) parsed.snippets = [];
-            return parsed;
-        } catch (error) {
-            return { snippets: [] };
-        }
-    }
-
-    function writeDb(data) {
-        fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
-    }
+    const { readDb, writeDb } = require('../utils/db');
 
     ipcMain.handle('get-snippets', () => {
         const db = readDb();

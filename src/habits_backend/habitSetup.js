@@ -3,24 +3,7 @@ const path = require('path');
 const { ipcMain } = require('electron');
 
 module.exports = function setupHabits(app) {
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'reminders.json');
-
-    function readDb() {
-        if (!fs.existsSync(dbPath)) return { habits: [] };
-        try {
-            const data = fs.readFileSync(dbPath, 'utf8');
-            const parsed = JSON.parse(data);
-            if (!parsed.habits) parsed.habits = [];
-            return parsed;
-        } catch (error) {
-            return { habits: [] };
-        }
-    }
-
-    function writeDb(data) {
-        fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
-    }
+    const { readDb, writeDb } = require('../utils/db');
 
     ipcMain.handle('habits:get', () => {
         const db = readDb();

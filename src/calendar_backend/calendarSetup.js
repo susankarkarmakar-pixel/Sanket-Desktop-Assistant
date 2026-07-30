@@ -3,24 +3,7 @@ const path = require('path');
 const { ipcMain } = require('electron');
 
 module.exports = function setupCalendar(app) {
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'reminders.json');
-
-    function readDb() {
-        if (!fs.existsSync(dbPath)) return { calendar: [] };
-        try {
-            const data = fs.readFileSync(dbPath, 'utf8');
-            const parsed = JSON.parse(data);
-            if (!parsed.calendar) parsed.calendar = [];
-            return parsed;
-        } catch (error) {
-            return { calendar: [] };
-        }
-    }
-
-    function writeDb(data) {
-        fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
-    }
+    const { readDb, writeDb } = require('../utils/db');
 
     ipcMain.handle('get-calendar-events', () => {
         const db = readDb();

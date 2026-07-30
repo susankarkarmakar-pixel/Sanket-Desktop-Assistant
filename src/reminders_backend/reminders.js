@@ -2,50 +2,26 @@ const { ipcMain, app, Notification } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-let dataPath;
-
-function getDataPath() {
-  if (!dataPath) {
-    dataPath = path.join(app.getPath('userData'), 'reminders.json');
-  }
-  return dataPath;
-}
+const { readDb, writeDb, getModuleData, updateModuleData } = require('../utils/db');
 
 function getReminders() {
-  const p = getDataPath();
-  if (!fs.existsSync(p)) {
-    return [];
+  const db = readDb();
+  if (Array.isArray(db)) {
+    // Migration case
+    return db;
   }
-  const data = fs.readFileSync(p, 'utf-8');
-  try {
-    const parsed = JSON.parse(data);
-    if (Array.isArray(parsed)) {
-      return parsed; // legacy format
-    } else if (parsed && parsed.reminders) {
-      return parsed.reminders;
-    }
-    return [];
-  } catch (e) {
-    return [];
-  }
+  return db.reminders || [];
 }
 
 function saveReminders(reminders) {
-  const p = getDataPath();
-  let fullData = {};
-  if (fs.existsSync(p)) {
-    try {
-      fullData = JSON.parse(fs.readFileSync(p, 'utf-8'));
-    } catch(e) {}
-  }
-
-  if (Array.isArray(fullData)) {
-    fullData = { reminders: reminders, fileFinderFolders: [] };
+  const db = readDb();
+  if (Array.isArray(db)) {
+    // Migrate completely if still array
+    const newDb = { reminders: reminders };
+    writeDb(newDb);
   } else {
-    fullData.reminders = reminders;
+    updateModuleData('reminders', reminders);
   }
-
-  fs.writeFileSync(p, JSON.stringify(fullData, null, 2));
 }
 
 function setupRemindersBackend() {

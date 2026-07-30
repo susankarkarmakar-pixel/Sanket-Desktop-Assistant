@@ -4,35 +4,14 @@ const fs = require('fs');
 const Papa = require('papaparse');
 const XLSX = require('xlsx');
 
-let dataPath;
-
-function getDataPath() {
-  if (!dataPath) {
-    dataPath = path.join(app.getPath('userData'), 'reminders.json');
-  }
-  return dataPath;
-}
+const { readDb, writeDb } = require('../utils/db');
 
 function getData() {
-  const p = getDataPath();
-  if (!fs.existsSync(p)) {
-    return { reminders: [], fileFinderFolders: [], macros: [], activityHistory: [], contacts: [] };
-  }
-  try {
-    let parsed = JSON.parse(fs.readFileSync(p, 'utf-8'));
-    if (Array.isArray(parsed)) {
-      parsed = { reminders: parsed, fileFinderFolders: [], macros: [], activityHistory: [], contacts: [] };
-    }
-    if (!parsed.contacts) parsed.contacts = [];
-    return parsed;
-  } catch (e) {
-    return { reminders: [], fileFinderFolders: [], macros: [], activityHistory: [], contacts: [] };
-  }
+  return readDb();
 }
 
 function saveData(obj) {
-  const p = getDataPath();
-  fs.writeFileSync(p, JSON.stringify(obj, null, 2));
+  writeDb(obj);
 }
 
 function setupContactsBackend() {

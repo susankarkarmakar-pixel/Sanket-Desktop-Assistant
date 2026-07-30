@@ -27,28 +27,8 @@ function isBengali(text) {
 }
 
 module.exports = function setupVoiceBackend(app, getMainWindow) {
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'reminders.json');
+    const { readDb, writeDb } = require('../../src/utils/db');
     let engineInterval = null;
-
-    function readDb() {
-        if (!fs.existsSync(dbPath)) return { voiceSettings: DEFAULT_SETTINGS, reminders: [], calendar: [], todos: [] };
-        try {
-            const data = fs.readFileSync(dbPath, 'utf8');
-            const parsed = JSON.parse(data);
-            if (!parsed.voiceSettings) parsed.voiceSettings = DEFAULT_SETTINGS;
-            if (!parsed.reminders) parsed.reminders = [];
-            if (!parsed.calendar) parsed.calendar = [];
-            if (!parsed.todos) parsed.todos = [];
-            return parsed;
-        } catch (error) {
-            return { voiceSettings: DEFAULT_SETTINGS, reminders: [], calendar: [], todos: [] };
-        }
-    }
-
-    function writeDb(data) {
-        fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
-    }
 
     function isQuietHours(settings) {
         if (!settings.quietHours.enabled) return false;

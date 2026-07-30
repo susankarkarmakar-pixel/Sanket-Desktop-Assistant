@@ -3,24 +3,7 @@ const path = require('path');
 const { ipcMain } = require('electron');
 
 module.exports = function setupAnalytics(app) {
-    const userDataPath = app.getPath('userData');
-    const dbPath = path.join(userDataPath, 'reminders.json');
-
-    function readDb() {
-        if (!fs.existsSync(dbPath)) return { analytics: { pomodoroSessions: [] } };
-        try {
-            const data = fs.readFileSync(dbPath, 'utf8');
-            const parsed = JSON.parse(data);
-            if (!parsed.analytics) parsed.analytics = { pomodoroSessions: [] };
-            return parsed;
-        } catch (error) {
-            return { analytics: { pomodoroSessions: [] } };
-        }
-    }
-
-    function writeDb(data) {
-        fs.writeFileSync(dbPath, JSON.stringify(data, null, 2), 'utf8');
-    }
+    const { readDb, writeDb } = require('../utils/db');
 
     ipcMain.handle('analytics:logPomodoro', (event, { mode, durationSeconds }) => {
         const db = readDb();
