@@ -28,7 +28,7 @@ The following checks passed:
 
 The initial renderer bundle was approximately **577 kB** minified JavaScript. After lazy-loading the feature modules, the main renderer chunk is approximately **402 kB**, with feature modules emitted as separate chunks.
 
-The Windows NSIS installer build completed successfully after installing the required Wine runtime. The generated installer is `dist/Sanket Desktop Assistant Setup 1.0.0.exe`, with a size of approximately **108.2 MB** and SHA-256 checksum `5ce18b328499d2bb6d1170efa9eae7d8cff283021885105d5e3a4c03a7a68290`.
+The Windows NSIS installer build completed successfully after installing the required Wine runtime. The generated v1.0.7 installer is `dist/Sanket Desktop Assistant Setup 1.0.7.exe`, with a size of approximately **108.2 MB** and SHA-256 checksum `ac0b2f0693130460464c58d799998d519725fc471d9239befb4cccfc4ddc4f94`.
 
 ## Changed files
 
