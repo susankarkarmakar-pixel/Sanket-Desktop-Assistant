@@ -1,7 +1,11 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
-  onSetView: (callback) => ipcRenderer.on('set-view', (_event, value) => callback(value)),
+  onSetView: (callback) => {
+    const handler = (_event, value) => callback(value);
+    ipcRenderer.on('set-view', handler);
+    return () => ipcRenderer.removeListener('set-view', handler);
+  },
 
   // Reminders API
   getReminders: () => ipcRenderer.invoke('get-reminders'),

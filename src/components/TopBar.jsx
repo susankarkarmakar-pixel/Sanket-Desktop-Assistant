@@ -1,221 +1,185 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, Plus, Bell, Command, FileText, CheckCircle, BellRing, Link, Users, TerminalSquare, FolderSync, Volume2, VolumeX } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  Bell,
+  BellRing,
+  CheckCircle,
+  Command,
+  FolderSync,
+  Plus,
+  Search,
+  TerminalSquare,
+  Users,
+  Volume2,
+  VolumeX,
+} from 'lucide-react';
+
+const SEARCH_CACHE_TTL = 5000;
 
 export function TopBar({ currentViewLabel, setView, isVoicePlaying }) {
   const [isMuted, setIsMuted] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const searchRef = useRef(null);
+  const inputRef = useRef(null);
+  const searchOpenRef = useRef(false);
+  const searchCacheRef = useRef({ expiresAt: 0, data: null });
+  const requestIdRef = useRef(0);
+
+  useEffect(() => {
+    searchOpenRef.current = isSearchOpen;
+  }, [isSearchOpen]);
 
   useEffect(() => {
     const checkMute = () => {
-      const muteUntil = localStorage.getItem('sanket-voice-mute-until');
-      if (muteUntil && parseInt(muteUntil, 10) > Date.now()) {
-        setIsMuted(true);
-      } else {
-        setIsMuted(false);
-      }
+      const muteUntil = Number.parseInt(localStorage.getItem('sanket-voice-mute-until') || '0', 10);
+      setIsMuted(muteUntil > Date.now());
     };
     checkMute();
-    const interval = setInterval(checkMute, 10000); // Check every 10s
-    return () => clearInterval(interval);
+    const interval = window.setInterval(checkMute, 30000);
+    return () => window.clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setIsSearchOpen(true);
+        window.requestAnimationFrame(() => inputRef.current?.focus());
+      } else if (event.key === 'Escape' && searchOpenRef.current) {
+        setIsSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (!isSearchOpen) return undefined;
+
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) setIsSearchOpen(false);
+    };
+    window.addEventListener('mousedown', handleClickOutside);
+    return () => window.removeEventListener('mousedown', handleClickOutside);
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    const query = searchQuery.trim().toLowerCase();
+    const requestId = ++requestIdRef.current;
+    if (!query) {
+      setResults([]);
+      return undefined;
+    }
+
+    const debounceId = window.setTimeout(async () => {
+      try {
+        let data = searchCacheRef.current.data;
+        if (!data || searchCacheRef.current.expiresAt <= Date.now()) {
+          const safeCall = (method) => (method ? method() : Promise.resolve([])).catch(() => []);
+          const [reminders, todos, snippets, contacts, macros, organizerRules] = await Promise.all([
+            safeCall(window.api?.getReminders),
+            safeCall(window.api?.getTodos),
+            safeCall(window.api?.getSnippets),
+            safeCall(window.api?.getContacts),
+            safeCall(window.api?.getMacros),
+            safeCall(window.api?.getOrganizerRules),
+          ]);
+          data = { reminders, todos, snippets, contacts, macros, organizerRules };
+          searchCacheRef.current = { data, expiresAt: Date.now() + SEARCH_CACHE_TTL };
+        }
+
+        const includes = (value) => String(value || '').toLowerCase().includes(query);
+        const combinedResults = [
+          ...data.reminders.filter((item) => includes(item.title)).map((item) => ({ ...item, _type: 'reminder', _icon: BellRing, _view: 'reminders' })),
+          ...data.todos.filter((item) => includes(item.title)).map((item) => ({ ...item, _type: 'todo', _icon: CheckCircle, _view: 'todo' })),
+          ...data.snippets.filter((item) => includes(item.title) || includes(item.content)).map((item) => ({ ...item, _type: 'snippet', _icon: Command, _view: 'snippets' })),
+          ...data.contacts.filter((item) => includes(item.name)).map((item) => ({ ...item, _type: 'contact', title: item.name, _icon: Users, _view: 'contacts' })),
+          ...data.macros.filter((item) => includes(item.name)).map((item) => ({ ...item, _type: 'macro', title: item.name, _icon: TerminalSquare, _view: 'macros' })),
+          ...data.organizerRules.filter((item) => includes(item.sourceFolder) || includes(item.targetFolder) || includes(item.conditionValue)).map((item) => ({
+            ...item,
+            _type: 'organizer rule',
+            title: `${item.conditionType === 'extension' ? 'Ext' : 'Name'}: ${item.conditionValue}`,
+            _icon: FolderSync,
+            _view: 'organizer',
+          })),
+        ];
+
+        if (requestId === requestIdRef.current) setResults(combinedResults.slice(0, 10));
+      } catch (error) {
+        console.error('Search error:', error);
+        if (requestId === requestIdRef.current) setResults([]);
+      }
+    }, 240);
+
+    return () => window.clearTimeout(debounceId);
+  }, [searchQuery]);
 
   const toggleMute = () => {
     if (isMuted) {
       localStorage.removeItem('sanket-voice-mute-until');
       setIsMuted(false);
     } else {
-      // Mute for 1 hour
-      localStorage.setItem('sanket-voice-mute-until', (Date.now() + 60 * 60 * 1000).toString());
+      localStorage.setItem('sanket-voice-mute-until', String(Date.now() + 60 * 60 * 1000));
       setIsMuted(true);
-      window.speechSynthesis.cancel(); // Stop currently playing immediately
+      window.speechSynthesis?.cancel();
     }
   };
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [results, setResults] = useState([]);
-  const searchRef = useRef(null);
-  const inputRef = useRef(null);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsSearchOpen(true);
-        setTimeout(() => inputRef.current?.focus(), 100);
-      }
-      if (e.key === 'Escape' && isSearchOpen) {
-        setIsSearchOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSearchOpen]);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
-        setIsSearchOpen(false);
-      }
-    };
-    if (isSearchOpen) {
-      window.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => window.removeEventListener('mousedown', handleClickOutside);
-  }, [isSearchOpen]);
-
-  useEffect(() => {
-    const fetchResults = async () => {
-      if (!searchQuery.trim()) {
-        setResults([]);
-        return;
-      }
-
-      const lowerQuery = searchQuery.toLowerCase();
-      let combinedResults = [];
-
-      try {
-        if (window.api) {
-          // Reminders
-          if (window.api.getReminders) {
-            const reminders = await window.api.getReminders();
-            const matching = reminders.filter(r => r.title.toLowerCase().includes(lowerQuery));
-            combinedResults = [...combinedResults, ...matching.map(r => ({ ...r, _type: 'reminder', _icon: BellRing, _view: 'reminders' }))];
-          }
-          // Todos
-          if (window.api.getTodos) {
-            const todos = await window.api.getTodos();
-            const matching = todos.filter(t => t.title.toLowerCase().includes(lowerQuery));
-            combinedResults = [...combinedResults, ...matching.map(t => ({ ...t, _type: 'todo', _icon: CheckCircle, _view: 'todo' }))];
-          }
-          // Snippets
-          if (window.api.getSnippets) {
-            const snippets = await window.api.getSnippets();
-            const matching = snippets.filter(s => s.title.toLowerCase().includes(lowerQuery) || s.content.toLowerCase().includes(lowerQuery));
-            combinedResults = [...combinedResults, ...matching.map(s => ({ ...s, _type: 'snippet', _icon: Command, _view: 'snippets' }))];
-          }
-          // Contacts
-          if (window.api.getContacts) {
-            const contacts = await window.api.getContacts();
-            const matching = contacts.filter(c => c.name.toLowerCase().includes(lowerQuery));
-            combinedResults = [...combinedResults, ...matching.map(c => ({ ...c, _type: 'contact', title: c.name, _icon: Users, _view: 'contacts' }))];
-          }
-          // Macros
-          if (window.api.getMacros) {
-             const macros = await window.api.getMacros();
-             const matching = macros.filter(m => m.name.toLowerCase().includes(lowerQuery));
-             combinedResults = [...combinedResults, ...matching.map(m => ({ ...m, _type: 'macro', title: m.name, _icon: TerminalSquare, _view: 'macros' }))];
-          }
-          // Organizer Rules
-          if (window.api.getOrganizerRules) {
-             const rules = await window.api.getOrganizerRules();
-             const matching = rules.filter(r => (r.sourceFolder || '').toLowerCase().includes(lowerQuery) || (r.targetFolder || '').toLowerCase().includes(lowerQuery));
-             combinedResults = [...combinedResults, ...matching.map(r => ({ ...r, _type: 'organizer rule', title: `${r.conditionType === 'extension' ? 'Ext' : 'Name'}: ${r.conditionValue}`, _icon: FolderSync, _view: 'organizer' }))];
-          }
-        }
-      } catch (err) {
-        console.error("Search error:", err);
-      }
-
-      setResults(combinedResults.slice(0, 10)); // Top 10
-    };
-
-    const debounce = setTimeout(fetchResults, 200);
-    return () => clearTimeout(debounce);
-  }, [searchQuery]);
+  const openSearch = () => {
+    setIsSearchOpen(true);
+    window.requestAnimationFrame(() => inputRef.current?.focus());
+  };
 
   const handleSelectResult = (result) => {
     setIsSearchOpen(false);
     setSearchQuery('');
-    if (setView && result._view) {
-      setView(result._view);
-    }
+    if (result._view) setView(result._view);
   };
 
   return (
-    <header className="h-[52px] bg-surface/80 backdrop-blur-xl border-b border-border/50 flex items-center px-6 shrink-0 z-30 sticky top-0 drag-region mt-2 mr-2 rounded-t-2xl">
-
-      {/* Breadcrumb / Title */}
-      <div className="w-1/3 flex items-center no-drag-region">
-        <h1 className="text-lg font-semibold text-text capitalize">
-          {currentViewLabel || 'Dashboard'}
-        </h1>
+    <header className="drag-region z-30 flex h-[58px] shrink-0 items-center rounded-t-xl border-b border-border bg-surface px-4 sm:px-6" role="banner">
+      <div className="no-drag-region flex w-1/3 items-center">
+        <h1 className="truncate text-base font-semibold capitalize text-text sm:text-lg">{currentViewLabel || 'Dashboard'}</h1>
       </div>
 
-      {/* Global Search */}
-      <div className="w-1/3 flex justify-center no-drag-region" ref={searchRef}>
-        <div className="relative w-full max-w-md shadow-[0_1px_2px_rgba(0,0,0,0.04)] rounded-lg">
-          <div
-            className="relative group cursor-text"
-            onClick={() => {
-              setIsSearchOpen(true);
-              setTimeout(() => inputRef.current?.focus(), 10);
-            }}
-          >
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-text/50 group-hover:text-primary transition-colors" />
-            </div>
-            <div className="block w-full pl-10 pr-3 py-1.5 border border-border rounded-lg bg-surface text-text/50 sm:text-sm cursor-text hover:border-primary/50 transition-all">
-              Search anything...
-            </div>
-            <div className="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
-              <kbd className="hidden sm:inline-block border border-border rounded px-1.5 text-[10px] font-semibold text-text/50 bg-bg">
-                Ctrl K
-              </kbd>
-            </div>
-          </div>
+      <div className="no-drag-region flex w-1/3 justify-center" ref={searchRef}>
+        <div className="relative w-full max-w-md">
+          <button type="button" onClick={openSearch} aria-label="Open global search" className="group flex w-full items-center rounded-lg border border-border bg-bg px-3 py-2 text-left text-sm text-text/50 shadow-sm transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+            <Search className="mr-3 h-4 w-4 shrink-0 transition-colors group-hover:text-primary" aria-hidden="true" />
+            <span className="flex-1 truncate">Search anything…</span>
+            <kbd className="hidden rounded border border-border bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-text/50 sm:inline-block">Ctrl K</kbd>
+          </button>
 
           <AnimatePresence>
             {isSearchOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="absolute top-0 left-0 right-0 bg-surface border border-border shadow-2xl rounded-xl overflow-hidden z-50 flex flex-col max-h-[70vh]"
-              >
-                <div className="flex items-center p-2 border-b border-border bg-bg">
-                  <Search className="h-4 w-4 ml-2 mr-3 text-primary" />
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    className="flex-1 bg-transparent outline-none text-text py-2"
-                    placeholder="Search tasks, reminders, snippets..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  <kbd className="hidden sm:inline-block border border-border rounded px-1.5 text-[10px] font-semibold text-text/50 bg-surface mx-2">
-                    ESC
-                  </kbd>
+              <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ duration: 0.14 }} className="absolute left-0 right-0 top-0 z-50 flex max-h-[70vh] flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-2xl" role="dialog" aria-label="Global search">
+                <div className="flex items-center border-b border-border bg-bg p-2">
+                  <Search className="ml-2 mr-3 h-4 w-4 text-primary" aria-hidden="true" />
+                  <input ref={inputRef} type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search tasks, reminders, snippets…" aria-label="Search across Sanket" className="min-w-0 flex-1 bg-transparent py-2 text-text outline-none placeholder:text-text/40" />
+                  <kbd className="mx-2 hidden rounded border border-border bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-text/50 sm:inline-block">ESC</kbd>
                 </div>
 
                 <div className="overflow-y-auto">
                   {searchQuery && results.length > 0 ? (
                     <ul className="py-2">
-                      {results.map((result, i) => (
-                        <li key={`${result._type}-${result.id || i}`}>
-                          <button
-                            onClick={() => handleSelectResult(result)}
-                            className="w-full text-left px-4 py-2 hover:bg-primary/10 hover:text-primary transition-colors flex items-center gap-3 group"
-                          >
-                            <div className="p-1.5 rounded-md bg-bg border border-border group-hover:border-primary/30">
-                              <result._icon className="w-4 h-4 text-text/60 group-hover:text-primary" />
-                            </div>
-                            <div className="flex flex-col flex-1 min-w-0">
-                              <span className="font-medium text-sm truncate">{result.title}</span>
-                              <span className="text-xs text-text/50 capitalize">{result._type}</span>
-                            </div>
-                          </button>
-                        </li>
-                      ))}
+                      {results.map((result, index) => {
+                        const Icon = result._icon;
+                        return (
+                          <li key={`${result._type}-${result.id || index}`}>
+                            <button type="button" onClick={() => handleSelectResult(result)} className="group flex w-full items-center gap-3 px-4 py-2 text-left transition-colors hover:bg-primary/10 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary">
+                              <span className="rounded-md border border-border bg-bg p-1.5 group-hover:border-primary/30"><Icon className="h-4 w-4 text-text/60 group-hover:text-primary" aria-hidden="true" /></span>
+                              <span className="flex min-w-0 flex-1 flex-col"><span className="truncate text-sm font-medium">{result.title}</span><span className="text-xs capitalize text-text/50">{result._type}</span></span>
+                            </button>
+                          </li>
+                        );
+                      })}
                     </ul>
                   ) : searchQuery ? (
-                    <div className="p-8 text-center text-text/50 text-sm">
-                      No results found for "{searchQuery}"
-                    </div>
+                    <div className="p-8 text-center text-sm text-text/50">No results found for “{searchQuery}”</div>
                   ) : (
-                    <div className="p-8 text-center text-text/40 text-sm flex flex-col items-center">
-                      <Command className="w-8 h-8 mb-2 opacity-20" />
-                      Type to search across all your data.
-                    </div>
+                    <div className="flex flex-col items-center p-8 text-center text-sm text-text/40"><Command className="mb-2 h-8 w-8 opacity-20" aria-hidden="true" />Type to search across your data.</div>
                   )}
                 </div>
               </motion.div>
@@ -224,37 +188,14 @@ export function TopBar({ currentViewLabel, setView, isVoicePlaying }) {
         </div>
       </div>
 
-      {/* Right Actions */}
-      <div className="w-1/3 flex items-center justify-end space-x-2 sm:space-x-4 no-drag-region">
-
-        {/* Widget Spawner */}
-        <button
-          onClick={() => window.api && window.api.spawnWidget && window.api.spawnWidget(currentViewLabel.toLowerCase() === 'pomodoro' ? 'pomodoro' : 'todo')}
-          className="p-2 text-text/70 hover:text-primary hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors hidden sm:block"
-          title="Pop out as mini widget"
-        >
-          <svg xmlns="http://www.w3.org/0000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="9" x2="15" y1="3" y2="3"/><line x1="9" x2="15" y1="21" y2="21"/><path d="M15 3v18"/><path d="M9 3v18"/></svg>
-        </button>
-
-        <button
-          onClick={toggleMute}
-          className="p-2 text-text/70 hover:text-text hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors relative"
-          title={isMuted ? "Unmute Voice Announcements" : "Mute Voice Announcements (1 Hour)"}
-        >
+      <div className="no-drag-region flex w-1/3 items-center justify-end gap-1 sm:gap-2">
+        <button type="button" onClick={() => window.api?.spawnWidget?.(currentViewLabel?.toLowerCase() === 'pomodoro' ? 'pomodoro' : 'todo')} className="hidden rounded-lg p-2 text-text/70 transition-colors hover:bg-black/5 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:hover:bg-white/10 sm:block" title="Pop out as mini widget" aria-label="Pop out as mini widget"><Command className="h-5 w-5" /></button>
+        <button type="button" onClick={toggleMute} className="relative rounded-lg p-2 text-text/70 transition-colors hover:bg-black/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:hover:bg-white/10" title={isMuted ? 'Unmute voice announcements' : 'Mute voice announcements for one hour'} aria-label={isMuted ? 'Unmute voice announcements' : 'Mute voice announcements for one hour'}>
           {isMuted ? <VolumeX className="h-5 w-5 text-warning" /> : <Volume2 className="h-5 w-5" />}
-          {isVoicePlaying && !isMuted && (
-            <span className="absolute top-1 right-1 block h-2.5 w-2.5 rounded-full bg-success ring-2 ring-bg animate-pulse" />
-          )}
+          {isVoicePlaying && !isMuted && <span className="absolute right-1 top-1 h-2.5 w-2.5 animate-pulse rounded-full bg-success ring-2 ring-bg" />}
         </button>
-
-        <button className="p-2 text-text/70 hover:text-text hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-danger ring-2 ring-bg" />
-        </button>
-
-        <button className="flex items-center justify-center h-8 w-8 bg-primary hover:bg-primary-hover text-white rounded-md shadow-sm transition-transform active:scale-95">
-          <Plus className="h-5 w-5" />
-        </button>
+        <button type="button" className="relative rounded-lg p-2 text-text/70 transition-colors hover:bg-black/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:hover:bg-white/10" aria-label="Notifications" title="Notifications"><Bell className="h-5 w-5" /><span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-danger ring-2 ring-bg" /></button>
+        <button type="button" className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white shadow-sm transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="Create new item" title="Create new item"><Plus className="h-5 w-5" /></button>
       </div>
     </header>
   );
