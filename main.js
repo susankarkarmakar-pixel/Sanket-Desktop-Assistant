@@ -10,18 +10,23 @@ let isQuitting = false;
 const isDev = process.env.NODE_ENV !== 'production' && !(app && app.isPackaged);
 
 function createWindow() {
+  const isMac = process.platform === 'darwin';
+
   mainWindow = new BrowserWindow({
-    width: 1000,
-    height: 700,
-    minWidth: 800,
-    minHeight: 600,
+    width: 1100,
+    height: 760,
+    minWidth: 900,
+    minHeight: 620,
     show: false,
-    frame: process.platform === 'darwin', // Native frame on macOS for traffic lights, frameless on Windows/Linux
-    titleBarStyle: 'hidden', // Hides titlebar but keeps traffic lights on macOS
+    frame: false,
+    titleBarStyle: isMac ? 'hidden' : undefined,
     trafficLightPosition: { x: 16, y: 16 },
-    vibrancy: 'under-window',
-    visualEffectState: 'active',
-    backgroundColor: '#00000000', // Transparent for glass effect
+    vibrancy: isMac ? 'under-window' : undefined,
+    visualEffectState: isMac ? 'active' : undefined,
+    // Opaque Windows surfaces avoid the costly transparent compositor path while
+    // preserving the translucent appearance inside the renderer.
+    transparent: isMac,
+    backgroundColor: isMac ? '#00000000' : '#F5F5F7',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -95,7 +100,8 @@ function createTray() {
 }
 
 function showApp(view) {
-  if (mainWindow) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
     mainWindow.show();
     mainWindow.focus();
     mainWindow.webContents.send('set-view', view);
@@ -134,7 +140,8 @@ function createWidgetWindow(widgetType) {
     height: 400,
     show: false,
     frame: false,
-    transparent: true,
+    transparent: process.platform === 'darwin',
+    backgroundColor: process.platform === 'darwin' ? '#00000000' : '#F5F5F7',
     alwaysOnTop: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -163,25 +170,30 @@ function createWidgetWindow(widgetType) {
 app.whenReady().then(() => {
   createWindow();
   createTray();
-  setupRemindersBackend();
-  setupLauncherBackend();
-  setupFileFinderBackend();
-  setupAutomationBackend();
-  setupActivityBackend();
-  setupContactsBackend();
-  setupVaultBackend();
-  setupClipboardBackend();
-  setupNotesBackend();
-  setupEnhancedNotes(app);
-  setupTodoBackend(app);
-  setupCalendarBackend(app);
-  setupPomodoroBackend(app);
-  setupSnippetsBackend(app);
-  setupOrganizerBackend(app);
-  setupVoiceBackend(app, () => mainWindow);
-  setupHabitsBackend(app);
-  setupAnalyticsBackend(app);
-  setupSettingsBackend(app, () => mainWindow);
+
+  // Let the renderer paint the shell before initializing background services.
+  // This keeps the first window interactive on slower Windows machines.
+  setImmediate(() => {
+    setupRemindersBackend();
+    setupLauncherBackend();
+    setupFileFinderBackend();
+    setupAutomationBackend();
+    setupActivityBackend();
+    setupContactsBackend();
+    setupVaultBackend();
+    setupClipboardBackend();
+    setupNotesBackend();
+    setupEnhancedNotes(app);
+    setupTodoBackend(app);
+    setupCalendarBackend(app);
+    setupPomodoroBackend(app);
+    setupSnippetsBackend(app);
+    setupOrganizerBackend(app);
+    setupVoiceBackend(app, () => mainWindow);
+    setupHabitsBackend(app);
+    setupAnalyticsBackend(app);
+    setupSettingsBackend(app, () => mainWindow);
+  });
 
   ipcMain.handle('spawn-widget', (event, type) => {
     createWidgetWindow(type);

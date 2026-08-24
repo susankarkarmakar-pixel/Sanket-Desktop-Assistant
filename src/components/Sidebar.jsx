@@ -11,10 +11,9 @@ import {
   FileSearch,
   LayoutDashboard,
   Moon,
-  Settings,
+  Settings2,
   Sun,
   TerminalSquare,
-  Users,
   Lock,
   CalendarDays,
   PenTool,
@@ -23,7 +22,9 @@ import {
   Mic,
   BarChart3,
   Flame,
-  Settings2
+  Minimize2,
+  Maximize2,
+  X,
 } from 'lucide-react';
 
 const navItems = [
@@ -46,120 +47,102 @@ const navItems = [
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
 ];
 
+const controlButtonClass = 'no-drag-region flex h-8 w-8 items-center justify-center rounded-md text-text/60 transition-colors hover:bg-black/8 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:hover:bg-white/10';
+
 export function Sidebar({ currentView, setView }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const isMac = window.api?.getPlatform?.() === 'darwin';
 
-  // Custom window controls for Windows/Linux
-  const isMac = window.api && window.api.getPlatform ? window.api.getPlatform() === 'darwin' : false;
-
-  const handleMinimize = () => window.api?.minimizeWindow();
-  const handleMaximize = () => window.api?.maximizeWindow();
-  const handleClose = () => window.api?.closeWindow();
+  const handleMinimize = () => window.api?.minimizeWindow?.();
+  const handleMaximize = () => window.api?.maximizeWindow?.();
+  const handleClose = () => window.api?.closeWindow?.();
 
   return (
     <aside
       className={cn(
-        "h-screen bg-surface/80 backdrop-blur-2xl border-r border-border/50 transition-all duration-300 flex flex-col z-20 drag-region shadow-[1px_0_10px_rgba(0,0,0,0.02)] dark:shadow-none",
-        isExpanded ? "w-60" : "w-16"
+        'drag-region z-20 flex h-screen flex-col border-r border-border bg-surface shadow-[1px_0_10px_rgba(0,0,0,0.04)] transition-[width] duration-200 dark:shadow-none',
+        isExpanded ? 'w-60' : 'w-16',
       )}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
-      {/* Logo Area & Traffic Lights */}
-      <div className="h-[52px] flex items-center px-4 shrink-0 relative mt-2">
-
-        {/* Windows/Linux Custom Traffic Lights */}
+      <div className="relative flex h-[68px] shrink-0 items-center px-3">
         {!isMac && (
-          <div className="absolute top-2 left-4 flex gap-2 no-drag-region group/lights">
-            <button onClick={handleClose} className="w-3 h-3 rounded-full bg-[#FF3B30] border border-[#E0443E] flex items-center justify-center opacity-80 hover:opacity-100">
-               <span className="opacity-0 group-hover/lights:opacity-100 text-[8px] font-bold text-black/50 leading-none">x</span>
+          <div className={cn('absolute left-2 top-2 flex gap-0.5', !isExpanded && 'opacity-70')}>
+            <button type="button" onClick={handleClose} className={cn(controlButtonClass, 'hover:bg-danger/15 hover:text-danger')} aria-label="Close window" title="Close">
+              <X className="h-4 w-4" />
             </button>
-            <button onClick={handleMinimize} className="w-3 h-3 rounded-full bg-[#FF9500] border border-[#DEA129] flex items-center justify-center opacity-80 hover:opacity-100">
-               <span className="opacity-0 group-hover/lights:opacity-100 text-[8px] font-bold text-black/50 leading-none">-</span>
+            <button type="button" onClick={handleMinimize} className={controlButtonClass} aria-label="Minimize window" title="Minimize">
+              <Minimize2 className="h-3.5 w-3.5" />
             </button>
-            <button onClick={handleMaximize} className="w-3 h-3 rounded-full bg-[#28C840] border border-[#24B538] flex items-center justify-center opacity-80 hover:opacity-100">
-               <span className="opacity-0 group-hover/lights:opacity-100 text-[8px] font-bold text-black/50 leading-none">+</span>
+            <button type="button" onClick={handleMaximize} className={controlButtonClass} aria-label="Maximize or restore window" title="Maximize or restore">
+              <Maximize2 className="h-3.5 w-3.5" />
             </button>
           </div>
         )}
 
-        <div className={cn("w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-primary-hover shadow-sm flex items-center justify-center shrink-0 no-drag-region", !isMac && "mt-6")}>
-          <span className="text-white font-bold text-lg">S</span>
+        <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary-hover shadow-sm no-drag-region', !isMac && 'mt-5')}>
+          <span className="text-lg font-bold text-white">S</span>
         </div>
-        <div className={cn(
-          "ml-3 font-semibold text-lg whitespace-nowrap overflow-hidden transition-all duration-300",
-          isExpanded ? "w-auto opacity-100" : "w-0 opacity-0",
-          !isMac && "mt-6"
-        )}>
+        <div className={cn('ml-3 overflow-hidden whitespace-nowrap text-lg font-semibold transition-[width,opacity] duration-200', isExpanded ? 'w-auto opacity-100' : 'w-0 opacity-0', !isMac && 'mt-5')}>
           Sanket
         </div>
-        <div className={cn(
-          "ml-auto w-2 h-2 rounded-full bg-success shrink-0 transition-opacity duration-300",
-          isExpanded ? "opacity-100" : "opacity-0 hidden",
-          !isMac && "mt-6"
-        )} title="System Status: Online" />
+        <div className={cn('ml-auto h-2 w-2 shrink-0 rounded-full bg-success transition-opacity duration-200', isExpanded ? 'opacity-100' : 'hidden opacity-0', !isMac && 'mt-5')} title="System status: Online" />
       </div>
 
-      {/* Nav Links */}
-      <div className="flex-1 overflow-y-auto py-4 px-2 space-y-1 overflow-x-hidden scrollbar-hide no-drag-region">
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setView(item.id)}
-            className={cn(
-              "w-full flex items-center h-10 px-2 rounded-lg transition-all relative group",
-              currentView === item.id
-                ? "bg-primary text-white shadow-sm"
-                : "text-text/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-text"
-            )}
-            title={!isExpanded ? item.label : undefined}
-          >
-            {currentView === item.id && (
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />
-            )}
-            <item.icon className="w-5 h-5 shrink-0 ml-1" />
-            <span className={cn(
-              "ml-3 whitespace-nowrap overflow-hidden transition-all duration-300",
-              isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 w-0"
-            )}>
-              {item.label}
-            </span>
-          </button>
-        ))}
-      </div>
+      <nav className="scrollbar-hide no-drag-region flex-1 space-y-1 overflow-x-hidden overflow-y-auto px-2 py-4" aria-label="Application modules">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = currentView === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setView(item.id)}
+              aria-current={isActive ? 'page' : undefined}
+              className={cn(
+                'group relative flex h-10 w-full items-center rounded-lg px-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                isActive ? 'bg-primary text-white shadow-sm' : 'text-text/80 hover:bg-black/5 hover:text-text dark:hover:bg-white/10',
+              )}
+              title={!isExpanded ? item.label : undefined}
+            >
+              {isActive && <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-white/80" />}
+              <Icon className="ml-1 h-5 w-5 shrink-0" aria-hidden="true" />
+              <span className={cn('ml-3 overflow-hidden whitespace-nowrap transition-[width,opacity,transform] duration-200', isExpanded ? 'translate-x-0 opacity-100' : 'w-0 -translate-x-2 opacity-0')}>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
 
-      {/* Bottom Area */}
-      <div className="p-2 border-t border-border/50 shrink-0 space-y-1 no-drag-region pb-4">
+      <div className="no-drag-region shrink-0 space-y-1 border-t border-border p-2 pb-4">
         <button
+          type="button"
           onClick={toggleTheme}
-          className="w-full flex items-center h-10 px-2 rounded-lg text-text/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-text transition-colors"
-          title={!isExpanded ? "Toggle Theme" : undefined}
+          className="flex h-10 w-full items-center rounded-lg px-2 text-text/80 transition-colors hover:bg-black/5 hover:text-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary dark:hover:bg-white/10"
+          title={!isExpanded ? 'Toggle theme' : undefined}
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
         >
-          {theme === 'dark' ? <Sun className="w-5 h-5 ml-1 shrink-0" /> : <Moon className="w-5 h-5 ml-1 shrink-0" />}
-          <span className={cn(
-            "ml-3 whitespace-nowrap overflow-hidden transition-all duration-300",
-            isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 w-0"
-          )}>
+          {theme === 'dark' ? <Sun className="ml-1 h-5 w-5 shrink-0" /> : <Moon className="ml-1 h-5 w-5 shrink-0" />}
+          <span className={cn('ml-3 overflow-hidden whitespace-nowrap transition-[width,opacity,transform] duration-200', isExpanded ? 'translate-x-0 opacity-100' : 'w-0 -translate-x-2 opacity-0')}>
             {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
           </span>
         </button>
 
         <button
+          type="button"
           onClick={() => setView('settings')}
+          aria-current={currentView === 'settings' ? 'page' : undefined}
           className={cn(
-            "w-full flex items-center h-10 px-2 rounded-lg transition-colors",
-            currentView === 'settings'
-              ? "bg-primary text-white shadow-sm"
-              : "text-text/80 hover:bg-black/5 dark:hover:bg-white/10 hover:text-text"
+            'flex h-10 w-full items-center rounded-lg px-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+            currentView === 'settings' ? 'bg-primary text-white shadow-sm' : 'text-text/80 hover:bg-black/5 hover:text-text dark:hover:bg-white/10',
           )}
-          title={!isExpanded ? "Settings" : undefined}
+          title={!isExpanded ? 'Settings' : undefined}
         >
-          <Settings2 className="w-5 h-5 ml-1 shrink-0" />
-          <span className={cn(
-            "ml-3 whitespace-nowrap overflow-hidden transition-all duration-300",
-            isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 w-0"
-          )}>
+          <Settings2 className="ml-1 h-5 w-5 shrink-0" />
+          <span className={cn('ml-3 overflow-hidden whitespace-nowrap transition-[width,opacity,transform] duration-200', isExpanded ? 'translate-x-0 opacity-100' : 'w-0 -translate-x-2 opacity-0')}>
             Settings
           </span>
         </button>

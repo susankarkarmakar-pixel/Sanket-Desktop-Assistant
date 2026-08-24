@@ -101,7 +101,16 @@ To build a production Windows Installer (.exe):
 2. Run `npm run dist`.
 3. The installer `.exe` will appear inside the `dist/` folder.
 
-To get a Windows installer automatically, create a new Release on GitHub — the `.exe` will be attached automatically within a few minutes.
+To get a Windows installer automatically, push a version tag that matches the version in `package.json`. The GitHub Actions workflow in `.github/workflows/release-build.yml` runs on tags matching `v*.*.*`, builds the Windows NSIS installer on `windows-latest`, and publishes the `.exe` and `.blockmap` files to the corresponding GitHub Release.
+
+### Automated release steps
+
+1. Update the version and commit it, for example: `npm version 1.0.8 --no-git-tag-version`.
+2. Push the commit to GitHub.
+3. Create and push the matching tag: `git tag v1.0.8 && git push origin v1.0.8`.
+4. Open the Actions or Releases tab to monitor the build and download the published installer.
+
+The workflow stops before packaging if the tag does not exactly match `v<package.json version>`. This prevents an installer from being published under the wrong release number.
 
 ## Structure
 - main.js: Main Electron process, handles window creation, global hotkeys, and system tray.
