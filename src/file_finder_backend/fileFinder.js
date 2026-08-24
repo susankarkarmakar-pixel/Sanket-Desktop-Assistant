@@ -106,4 +106,4 @@ function setupFileFinderBackend() {
   });
 }
 
-module.exports = { setupFileFinderBackend, migrateDataIfNeeded };
+module.exports = { setupFileFinderBackend };

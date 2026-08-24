@@ -2,7 +2,7 @@
 
 ## Scope
 
-This update focuses on the Electron/React shell used by the Windows desktop application. It improves startup behavior, navigation responsiveness, Windows window controls, keyboard accessibility, and global search latency without changing the feature-specific data APIs.
+This update focuses on the Electron/React shell used by the Windows desktop application. It improves startup behavior, navigation responsiveness, Windows window controls, keyboard accessibility, and global search latency without changing the feature-specific data APIs. It also fixes a packaged startup crash in the file-finder backend caused by exporting the removed `migrateDataIfNeeded` symbol.
 
 ## Implemented changes
 
@@ -28,7 +28,7 @@ The following checks passed:
 
 The initial renderer bundle was approximately **577 kB** minified JavaScript. After lazy-loading the feature modules, the main renderer chunk is approximately **402 kB**, with feature modules emitted as separate chunks.
 
-The Windows NSIS installer build completed successfully after installing the required Wine runtime. The generated v1.0.7 installer is `dist/Sanket Desktop Assistant Setup 1.0.7.exe`, with a size of approximately **108.2 MB** and SHA-256 checksum `ac0b2f0693130460464c58d799998d519725fc471d9239befb4cccfc4ddc4f94`.
+The Windows NSIS installer build completed successfully after installing the required Wine runtime. The corrected v1.0.8 installer is `dist/Sanket Desktop Assistant Setup 1.0.8.exe`, with a size of approximately **108.2 MB**. Its SHA-256 checksum is recorded with the published release.
 
 ## Changed files
 
@@ -38,3 +38,4 @@ The Windows NSIS installer build completed successfully after installing the req
 - `src/components/Sidebar.jsx`
 - `src/components/TopBar.jsx`
 - `src/index.css`
+- `src/file_finder_backend/fileFinder.js`
